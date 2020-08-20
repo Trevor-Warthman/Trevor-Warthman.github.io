@@ -38,6 +38,11 @@ body {
   box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
 }
 
+img {
+  height: 600px;
+  width: 400px;
+}
+
 .cover-container {
   max-width: 42em;
 }
