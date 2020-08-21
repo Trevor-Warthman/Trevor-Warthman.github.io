@@ -41,6 +41,7 @@ body {
 img {
   width: 320px;
   height: auto;
+  overflow: hidden;
 }
 
 .cover-container {
