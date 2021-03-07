@@ -8,6 +8,7 @@
 
 .nav-list {
   list-style-type:none;
+  text-decoration: none;
 }
 
 /* Ids */
