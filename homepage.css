@@ -6,6 +6,10 @@
   max-width: 70%;
 }
 
+.nav-list {
+  list-style-type:none;
+}
+
 /* Ids */
 #nav-bar {
   height: 50%;
