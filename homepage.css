@@ -12,4 +12,5 @@
   width: 8%;
   z-index: +1;
   position: fixed;
+  top: 80px;
 }
