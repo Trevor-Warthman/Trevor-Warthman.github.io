@@ -5,6 +5,9 @@
   min-height: 100%;
   width: 100%;
 }
+.content-container {
+  width: 70%
+}
 
 .nav-list {
   list-style-type:none;
