@@ -3,7 +3,7 @@
 /* Classes */
 .container {
   min-height: 100%;
-  max-width: 70%;
+  width: 100%;
 }
 
 .nav-list {
