@@ -21,6 +21,8 @@
 }
 #nav-bar > ul > li {
   background-color: grey;
+  height: 25px;
+  width: 100%;
 }
 #nav-bar > ul > li::hover {
   background-color: blue;
