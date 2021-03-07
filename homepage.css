@@ -32,3 +32,6 @@
 #nav-bar > ul > li::hover {
   background-color: blue;
 }
+#trevor {
+  height: 400px;
+}
