@@ -18,3 +18,9 @@
   position: fixed;
   top: 80px;
 }
+#nav-bar > ul > li {
+  background-color: grey;
+}
+#nav-bar > ul > li::hover {
+  background-color: blue;
+}
