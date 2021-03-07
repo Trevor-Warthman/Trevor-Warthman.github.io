@@ -20,6 +20,7 @@
   float: right;
 }
 #nav-bar > ul > li {
+  background-position: right 30px;
   background-color: grey;
   height: 25px;
   width: 100%;
