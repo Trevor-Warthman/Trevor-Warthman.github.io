@@ -1,5 +1,15 @@
 
+
+/* Classes */
 .container {
   min-height: 100%;
   max-width: 70%;
+}
+
+/* Ids */
+#nav-bar {
+  height: 50%;
+  width: 8%;
+  z-index: +1;
+  position: fixed;
 }
