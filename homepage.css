@@ -17,6 +17,11 @@ img {
   text-decoration: none;
 }
 
+.segmentHead {
+  background-color: #9A9798;
+  height: 10%;
+}
+
 /* Ids */
 #nav-bar {
   height: 50%;
