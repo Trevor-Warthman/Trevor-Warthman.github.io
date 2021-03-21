@@ -24,6 +24,7 @@ img {
   z-index: +1;
   position: fixed;
   top: 80px;
+  right: 30px;
   float: right;
 }
 #nav-bar > ul > li {
