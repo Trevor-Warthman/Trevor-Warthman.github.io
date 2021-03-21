@@ -22,6 +22,11 @@ img {
   height: 10%;
 }
 
+.project-row {
+ display: flex;
+ flex-direction: row;
+}
+
 a.button {
     -webkit-appearance: button;
     -moz-appearance: button;
