@@ -14,7 +14,7 @@ img {
 
 .nav-link {
   color: white;
-  background-color: #1B59A0;
+  background-color: #4B82C1;
   width: 100%;
   text-decoration: none;
   font: bold 12px Arial;
@@ -46,7 +46,7 @@ a.button {
 
 /* Ids */
 #nav-bar {
-  height: 50%;
+  height: 200px;
   width: 8%;
   z-index: +1;
   position: fixed;
