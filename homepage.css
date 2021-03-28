@@ -12,6 +12,11 @@ img {
   width: 70%
 }
 
+.nav-link {
+  color: white;
+  border: 1px solid #1B59A0;
+}
+
 .nav-list {
   list-style-type:none;
   text-decoration: none;
