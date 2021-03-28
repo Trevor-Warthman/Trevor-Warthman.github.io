@@ -14,7 +14,10 @@ img {
 
 .nav-link {
   color: white;
-  border: 1px solid #1B59A0;
+  background-color: #1B59A0;
+  width: 100%;
+  text-decoration: none;
+  font: bold 12px Arial;
 }
 
 .nav-list {
