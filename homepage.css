@@ -14,6 +14,7 @@ h1, h2, h3, h4, h5, h6 {
 
 a {
   text-decoration: none;
+  color: #D1E8E2;
 }
 
 /* Classes */
@@ -44,6 +45,10 @@ a.button {
 
 .projectRow {
   width: 90%;
+}
+
+.websiteLink {
+  border: 1px solid #49c5b6;
 }
 
 /* Ids */
