@@ -36,12 +36,9 @@ img {
 }
 
 a.button {
-    -webkit-appearance: button;
-    -moz-appearance: button;
     appearance: button;
-
     text-decoration: none;
-    color: #5A83E5;
+    background-color: #C38D9E;
 }
 
 /* Ids */

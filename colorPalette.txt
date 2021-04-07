@@ -1,0 +1,16 @@
+Color Pallett
+
+#E27D60 - brickish orange
+#85DCB - turquoise 
+#E8A87C - brown-yellow
+#C38D9E - matte dark pink
+#41B3A3 - bright blue green
+With White #FFFFF
+
+General assumptions: 
+Background: #41B3A3
+Header div coloring: #E27D60
+Header div text: #E27D60
+Buttons: #C38D9E
+Text: White #FFFFF
+
