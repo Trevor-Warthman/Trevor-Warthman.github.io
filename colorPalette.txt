@@ -8,10 +8,20 @@ Color Pallett
 With White #FFFFF
 With grey #686868
 
+Let's try sleek and futuristic
+#2c3531
+#116466
+#D9B08C
+#FFCB9A
+#D1E8E2
+With White text
+
 General assumptions: 
-Background: #41B3A3
-Header div coloring: #E27D60
-Header div text: #E27D60
-Buttons: #C38D9E
+Primary Background: #2c3531
+Secondary Background: #116466
+Header div coloring:  #116466
+Header div text: a brighter green like #41B3A3
+Buttons: #D9B08C
+Outlines: #D1E8E2
 Text: White #FFFFF
 
