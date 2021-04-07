@@ -12,6 +12,10 @@ h1, h2, h3, h4, h5, h6 {
   color: #49c5b6
 }
 
+a {
+  text-decoration: none;
+}
+
 /* Classes */
 .container {
   min-height: 100vh;
@@ -68,11 +72,10 @@ a.button {
 
 .nav-link {
   display: inline-block;
-  color: white;
+  color: #49c5b6;
   background-color: #116466;
   width: 100%;
   height: 100%;
-  text-decoration: none;
   font: bold 12px Arial;
   border: 1px solid black;
 }
