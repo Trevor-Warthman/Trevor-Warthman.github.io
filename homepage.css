@@ -3,6 +3,10 @@ img {
  width: 40%;
 }
 
+body {
+  background-color:#41B3A3
+}
+
 /* Classes */
 .container {
   min-height: 100vh;
@@ -26,7 +30,7 @@ img {
 }
 
 .segmentHead {
-  background-color: #9A9798;
+  background-color: #E27D60;
   height: 10%;
 }
 
