@@ -8,6 +8,10 @@ body {
   color: #FFFFFF;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  color: #49c5b6
+}
+
 /* Classes */
 .container {
   min-height: 100vh;
@@ -31,7 +35,7 @@ body {
 
 .segmentHead {
   background-color: #116466;
-  color: #41B3A3;
+  color: #49c5b6;
   height: 10%;
 }
 
