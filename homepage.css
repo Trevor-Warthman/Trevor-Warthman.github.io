@@ -4,7 +4,8 @@ img {
 }
 
 body {
-  background-color:#41B3A3
+  background-color:#41B3A3;
+  color: #FFFFFF;
 }
 
 /* Classes */
@@ -31,6 +32,7 @@ body {
 
 .segmentHead {
   background-color: #E27D60;
+  color: #686868
   height: 10%;
 }
 

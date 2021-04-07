@@ -6,6 +6,7 @@ Color Pallett
 #C38D9E - matte dark pink
 #41B3A3 - bright blue green
 With White #FFFFF
+With grey #686868
 
 General assumptions: 
 Background: #41B3A3
