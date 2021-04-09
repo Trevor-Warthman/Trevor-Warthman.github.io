@@ -18,6 +18,10 @@ a {
 }
 
 /* Classes */
+
+.sidebyside {
+  display: inline-block;
+}
 .container {
   min-height: 100vh;
   width: 100%;
@@ -52,14 +56,18 @@ a.button {
 }
 
 .ratingIcon {
-  background-color: #116466;
+  background-color: #FFCB9A;
   height: 150px;
   width: 300px;
-  border-radius:65%;
+  border-radius:50%;
 
 }
 .checked {
   color: #41B3A3;
+}
+
+fa fa-star {
+  vertical-align: middle;
 }
 
 /* Ids */
