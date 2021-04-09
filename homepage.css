@@ -55,6 +55,8 @@ a.button {
   border: 1px solid #49c5b6;
 }
 
+/* Skill styles */
+
 .ratingIcon {
   /* background-color: #D1E8E2; */
   height: 60px;
@@ -72,6 +74,11 @@ a.button {
 
 .stars { 
   padding-top: 30px;
+}
+
+.skillIcon {
+  width: 50px;
+  height: 50px;
 }
 
 /* Ids */
