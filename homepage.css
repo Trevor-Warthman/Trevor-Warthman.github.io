@@ -51,6 +51,13 @@ a.button {
   border: 1px solid #49c5b6;
 }
 
+.ratingIcon {
+  background-color: #116466;
+}
+.checked {
+  color: #41B3A3;
+}
+
 /* Ids */
 
 
