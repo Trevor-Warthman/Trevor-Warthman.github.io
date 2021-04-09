@@ -66,8 +66,9 @@ a.button {
   color: #41B3A3;
 }
 
-fa fa-star {
+.stars {
   vertical-align: middle;
+  text-align: middle;
 }
 
 /* Ids */
