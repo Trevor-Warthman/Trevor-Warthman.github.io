@@ -60,15 +60,15 @@ a.button {
   height: 60px;
   width: 120px;
   border-radius:60%;
+  text-align: middle;
 
 }
 .checked {
   color: #41B3A3;
 }
 
-.stars {
-  vertical-align: middle;
-  text-align: middle;
+.stars { 
+  padding-top: 30px;
 }
 
 /* Ids */
