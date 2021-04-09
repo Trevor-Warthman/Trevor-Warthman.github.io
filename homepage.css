@@ -53,6 +53,10 @@ a.button {
 
 .ratingIcon {
   background-color: #116466;
+  height: 150px;
+  width: 300px;
+  border-radius:65%;
+
 }
 .checked {
   color: #41B3A3;
