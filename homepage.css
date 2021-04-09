@@ -68,7 +68,7 @@ a.button {
   color: #41B3A3;
 }
 
-.fa-star :not(.checked){
+.fa .fa-star :not(.checked){
   color: #FFCB9A;
 }
 
