@@ -56,15 +56,18 @@ a.button {
 }
 
 .ratingIcon {
-  background-color: #FFCB9A;
+  background-color: #D1E8E2;
   height: 60px;
   width: 120px;
   border-radius:60%;
-  text-align: middle;
-
+  text-align: center;
 }
 .checked {
   color: #41B3A3;
+}
+
+.fa .fa-star {
+  color: #FFCB9A;
 }
 
 .stars { 
