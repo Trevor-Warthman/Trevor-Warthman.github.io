@@ -1,6 +1,6 @@
 <template>
   <div id="home" class="profile-page">
-    <img id="landing-background" src="./code.jpg" />
+    <img id="landing-background" src="../assets/images/code.jpg" />
     <div id="intro-box">
       <div>
         <span class="pink-text">Hello</span>, I'm
@@ -30,8 +30,6 @@ export default {
 <style scoped>
 
 #home {
-  /*background-image: url("code.jpg");
-  background-color: black;*/
   position: relative;
 }
 #landing-background {

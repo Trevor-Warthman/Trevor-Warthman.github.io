@@ -41,19 +41,19 @@
           class="outside-link"
           href="https://github.com/Trevor-Warthman/"
           target="_blank"
-          ><img src="./github.png"
+          ><img src="../assets/icons/github.png"
         /></a>
         <a
           class="outside-link"
           href="https://www.linkedin.com/in/trevor-warthman"
           target="_blank"
-          ><img src="./linkedin.png"
+          ><img src="../assets/icons/linkedin.png"
         /></a>
         <a
           class="outside-link"
           href="https://github.com/Trevor-Warthman"
           target="_blank"
-          ><img src="./resume.png"
+          ><img src="../assets/icons/resume.png"
         /></a>
       </div>
     </nav>

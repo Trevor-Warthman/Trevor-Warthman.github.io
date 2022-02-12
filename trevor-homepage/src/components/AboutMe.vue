@@ -13,7 +13,7 @@
           </p>
           <p>
             I am a fulltime Software Engineer for MoreSteam.com, a position I
-            really enjoy, where I've gained experiance in frontend and backend
+            really enjoy, where I've gained experience in frontend and backend
             code, UI/UX design, automated testing, API development, and Cloud
             (Azure) Devops, among other web development
             <a
@@ -30,7 +30,7 @@
         </div>
       </div>
       <div>
-        <img src="./me.jpg" class="side-img" />
+        <img src="../assets/images/me.jpg" class="side-img" />
       </div>
     </div>
   </div>

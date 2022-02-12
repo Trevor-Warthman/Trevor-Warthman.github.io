@@ -7,7 +7,7 @@
           class="current-portfolio-page-icon"
           title="Projects"
         >
-          <img src="./projects.png" />
+          <img src="../assets/icons/projects.png" />
         </div>
         <div
           v-else
@@ -15,7 +15,7 @@
           @click="this.setPortfolioState('projects')"
           title="Projects"
         >
-          <img src="./projects.png" />
+          <img src="../assets/icons/projects.png" />
         </div>
 
         <div
@@ -23,7 +23,7 @@
           class="current-portfolio-page-icon"
           title="Skills"
         >
-          <img src="./skills.png" />
+          <img src="../assets/icons/skills.png" />
         </div>
         <div
           v-else
@@ -31,7 +31,7 @@
           @click="this.setPortfolioState('skills')"
           title="Skills"
         >
-          <img src="./skills.png" />
+          <img src="../assets/icons/skills.png" />
         </div>
 
         <div
@@ -39,7 +39,7 @@
           class="current-portfolio-page-icon"
           title="Experience"
         >
-          <img src="./experience.png" />
+          <img src="../assets/icons/experience.png" />
         </div>
         <div
           v-else
@@ -47,7 +47,7 @@
           @click="this.setPortfolioState('experience')"
           title="Experience"
         >
-          <img src="./experience.png" />
+          <img src="../assets/icons/experience.png" />
         </div>
       </div>
       <div
