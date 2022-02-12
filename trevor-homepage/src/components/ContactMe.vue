@@ -1,11 +1,13 @@
 <template>
   <div id="contactMe" class="profile-page">
-    <ul>
-      <li>Phone: 440-787-5778</li>
-      <li>Email: twarthman104@gmail.com</li>
-      <li>Popup box to have them enter their info and proposal</li>
-      <li></li>
-    </ul>
+    <div id="contactMeContent" class="profile-page-content">
+      <ul>
+        <li>Phone: 440-787-5778</li>
+        <li>Email: twarthman104@gmail.com</li>
+        <li>Popup box to have them enter their info and proposal</li>
+        <li></li>
+      </ul>
+    </div>
   </div>
 </template>
 

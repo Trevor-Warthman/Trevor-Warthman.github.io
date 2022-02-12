@@ -44,9 +44,9 @@ a {
 }
 
 .profile-page {
-  height: 100vh;
+  height: calc(var(--page-height) - 2px);
   width: 100vw;
-  padding-top: 10vh;
+  border-bottom: 2px dashed blue;
 }
 /* 
 Colors:
@@ -61,6 +61,9 @@ Secondary background: EEB868
 /* Global CSS Variables */
 
 :root {
+  --outer-bar-height: 10vh;
+  --page-height: 100vh;
+
   --intro-box-width: 500px;
   --intro-font-size: 30px;
 
@@ -73,6 +76,7 @@ Secondary background: EEB868
   --secondary-yellow: #FED766;
 
   --common-border-radius: 8px;
+  
 }
 /* Global Element Styles*/
 h1 {

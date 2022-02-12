@@ -1,35 +1,37 @@
 <template>
   <div id="aboutMe" class="profile-page flexrow">
-    <div class="left-60">
+    <div id="aboutMeContent" class="profile-page-content">
+      <div class="left-60">
+        <div>
+          <h1>About Me</h1>
+        </div>
+        <div id="aboutMeText1">
+          <p>I am a Full Stack Web Developer from Columbus, Ohio.<br /></p>
+          <p>
+            I enjoy cooking, coding, eating good Asian food, hiking, camping, and
+            music. When I get the time, I enjoy playing the trumpet.
+          </p>
+          <p>
+            I am a fulltime Software Engineer for MoreSteam.com, a position I
+            really enjoy, where I've gained experiance in frontend and backend
+            code, UI/UX design, automated testing, API development, and Cloud
+            (Azure) Devops, among other web development
+            <a
+              href="#portfolioContent"
+              @click="this.emitPortfolioToSkill()"
+              class="blue-link"
+              >Skills</a
+            >. Continued desc...
+          </p>
+          <p>
+            <a href="#contactMeContent" class="blue-link">Get in touch</a> with me to
+            talk about how I can help with your software needs.
+          </p>
+        </div>
+      </div>
       <div>
-        <h1>About Me</h1>
+        <img src="./me.jpg" class="side-img" />
       </div>
-      <div id="aboutMeText1">
-        <p>I am a Full Stack Web Developer from Columbus, Ohio.<br /></p>
-        <p>
-          I enjoy cooking, coding, eating good Asian food, hiking, camping, and
-          music. When I get the time, I enjoy playing the trumpet.
-        </p>
-        <p>
-          I am a fulltime Software Engineer for MoreSteam.com, a position I
-          really enjoy, where I've gained experiance in frontend and backend
-          code, UI/UX design, automated testing, API development, and Cloud
-          (Azure) Devops, among other web development
-          <a
-            href="#portfolio"
-            @click="this.emitPortfolioToSkill()"
-            class="blue-link"
-            >Skills</a
-          >. Continued desc...
-        </p>
-        <p>
-          <a href="#contactMe" class="blue-link">Get in touch</a> with me to
-          talk about how I can help with your software needs.
-        </p>
-      </div>
-    </div>
-    <div>
-      <img src="./me.jpg" class="side-img" />
     </div>
   </div>
 </template>

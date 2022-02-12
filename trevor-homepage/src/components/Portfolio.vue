@@ -1,71 +1,73 @@
 <template>
   <div id="portfolio" class="profile-page">
-    <div id="portfolio-page-selectors">
+    <div id="portfolioContent" class="profile-page-content">
+      <div id="portfolio-page-selectors">
+        <div
+          v-if="this.currentPortfolioPage === 'projects'"
+          class="current-portfolio-page-icon"
+          title="Projects"
+        >
+          <img src="./projects.png" />
+        </div>
+        <div
+          v-else
+          class="unselected-portfolio-page-icon"
+          @click="this.setPortfolioState('projects')"
+          title="Projects"
+        >
+          <img src="./projects.png" />
+        </div>
+
+        <div
+          v-if="this.currentPortfolioPage === 'skills'"
+          class="current-portfolio-page-icon"
+          title="Skills"
+        >
+          <img src="./skills.png" />
+        </div>
+        <div
+          v-else
+          class="unselected-portfolio-page-icon"
+          @click="this.setPortfolioState('skills')"
+          title="Skills"
+        >
+          <img src="./skills.png" />
+        </div>
+
+        <div
+          v-if="this.currentPortfolioPage === 'experience'"
+          class="current-portfolio-page-icon"
+          title="Experience"
+        >
+          <img src="./experience.png" />
+        </div>
+        <div
+          v-else
+          class="unselected-portfolio-page-icon"
+          @click="this.setPortfolioState('experience')"
+          title="Experience"
+        >
+          <img src="./experience.png" />
+        </div>
+      </div>
       <div
         v-if="this.currentPortfolioPage === 'projects'"
-        class="current-portfolio-page-icon"
-        title="Projects"
+        id="portfolio-page-container"
       >
-        <img src="./projects.png" />
+        <Projects />
       </div>
-      <div
-        v-else
-        class="unselected-portfolio-page-icon"
-        @click="this.setPortfolioState('projects')"
-        title="Projects"
-      >
-        <img src="./projects.png" />
-      </div>
-
       <div
         v-if="this.currentPortfolioPage === 'skills'"
-        class="current-portfolio-page-icon"
-        title="Skills"
+        id="portfolio-page-container"
       >
-        <img src="./skills.png" />
+        <Skills />
       </div>
-      <div
-        v-else
-        class="unselected-portfolio-page-icon"
-        @click="this.setPortfolioState('skills')"
-        title="Skills"
-      >
-        <img src="./skills.png" />
-      </div>
-
       <div
         v-if="this.currentPortfolioPage === 'experience'"
-        class="current-portfolio-page-icon"
-        title="Experience"
+        id="portfolio-page-container"
       >
-        <img src="./experience.png" />
+        <Experience />
       </div>
-      <div
-        v-else
-        class="unselected-portfolio-page-icon"
-        @click="this.setPortfolioState('experience')"
-        title="Experience"
-      >
-        <img src="./experience.png" />
-      </div>
-    </div>
-    <div
-      v-if="this.currentPortfolioPage === 'projects'"
-      id="portfolio-page-container"
-    >
-      <Projects />
-    </div>
-    <div
-      v-if="this.currentPortfolioPage === 'skills'"
-      id="portfolio-page-container"
-    >
-      <Skills />
-    </div>
-    <div
-      v-if="this.currentPortfolioPage === 'experience'"
-      id="portfolio-page-container"
-    >
-      <Experience />
     </div>
   </div>
 </template>

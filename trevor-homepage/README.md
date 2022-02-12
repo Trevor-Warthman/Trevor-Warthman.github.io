@@ -37,3 +37,6 @@ With a shell script and configurations in vue.config.js, we can simply run "bash
 
 ### Github pages
 with gh-pages branch is created/updated by the deploy.sh script, working in conjuction with an ssh key I believe, to get this site onto the deployment branch.
+
+### Production
+This website is deployed at https://trevor-warthman.github.io/
