@@ -1,4 +1,4 @@
-import { AnchorHTMLAttributes, MouseEvent, ReactNode, useEffect, useState } from 'react'
+import { AnchorHTMLAttributes, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react'
 
 export type LocationState = {
   pathname: string
@@ -6,6 +6,7 @@ export type LocationState = {
 }
 
 export function useLocation(): LocationState {
+  const initialLocation = useRef(true)
   const [location, setLocation] = useState<LocationState>(() => ({
     pathname: normalizePath(window.location.pathname),
     hash: window.location.hash,
@@ -27,6 +28,8 @@ export function useLocation(): LocationState {
     window.requestAnimationFrame(() => {
       if (target) target.scrollIntoView()
       else window.scrollTo({ top: 0 })
+      if (initialLocation.current) initialLocation.current = false
+      else document.querySelector<HTMLElement>('#main h1')?.focus()
     })
   }, [location])
 
@@ -41,6 +44,9 @@ function normalizePath(pathname: string) {
 export function navigate(href: string) {
   window.history.pushState({}, '', href)
   window.dispatchEvent(new PopStateEvent('popstate'))
+  window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+    document.querySelector<HTMLElement>('#main h1')?.focus()
+  }))
 }
 
 type SiteLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
@@ -64,4 +70,3 @@ export function SiteLink({ href, children, onClick, ...props }: SiteLinkProps) {
 
   return <a href={href} onClick={handleClick} {...props}>{children}</a>
 }
-

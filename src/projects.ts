@@ -13,6 +13,13 @@ export type Project = {
   media: { type: 'image' | 'video'; src?: string; alt: string }[]
 }
 
+export type EarlierProject = {
+  name: string
+  summary: string
+  repository: string
+  stack: string[]
+}
+
 export const projects: Project[] = [
   {
     slug: 'pensieve',
@@ -53,5 +60,44 @@ export const projects: Project[] = [
     approach: 'Assign a default destination to each tab group, such as a code review or project page.',
     outcome: 'The extension provides a reusable default-page workflow for restored tab groups.',
     media: [{ type: 'video', alt: 'Extension walkthrough to be added' }],
+  },
+]
+
+export const earlierProjects: EarlierProject[] = [
+  {
+    name: 'Recipe App',
+    summary: 'A TypeScript recipe application built before the Chef service.',
+    repository: 'https://github.com/Trevor-Warthman/recipe-app',
+    stack: ['TypeScript'],
+  },
+  {
+    name: 'Turtle Reviews',
+    summary: 'A TypeScript food review site.',
+    repository: 'https://github.com/Trevor-Warthman/turtle-reviews',
+    stack: ['TypeScript'],
+  },
+  {
+    name: 'Blog Posts',
+    summary: 'A Vue site for personal learning entries.',
+    repository: 'https://github.com/Trevor-Warthman/blog-posts',
+    stack: ['Vue'],
+  },
+  {
+    name: 'Roman Numeral Calculator',
+    summary: 'A small web calculator for Roman numerals.',
+    repository: 'https://github.com/Trevor-Warthman/RomanNumeralCalculator',
+    stack: ['HTML', 'JavaScript'],
+  },
+  {
+    name: 'DiagnOSU',
+    summary: 'A COVID-19 medical chatbot project.',
+    repository: 'https://github.com/Trevor-Warthman/DiagnOSU',
+    stack: ['JavaScript'],
+  },
+  {
+    name: 'DiagnOSU Twitter Bot',
+    summary: 'A bot experiment that generated posts from the DiagnOSU project.',
+    repository: 'https://github.com/Trevor-Warthman/DiagnOSUTwitterBot',
+    stack: ['Python', 'Jupyter'],
   },
 ]
