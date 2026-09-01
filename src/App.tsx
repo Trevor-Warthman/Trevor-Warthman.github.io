@@ -75,23 +75,10 @@ const professionalProjects = [
   },
 ]
 
-function ConventionalNav() {
-  return (
-    <nav className="fallback-nav" aria-label="Primary navigation">
-      <SiteLink href="/resume">Résumé</SiteLink>
-      <SiteLink href="/experience">Experience</SiteLink>
-      <SiteLink href="/work">Work</SiteLink>
-      <SiteLink href="/projects">Projects</SiteLink>
-      <SiteLink href="/about">About</SiteLink>
-    </nav>
-  )
-}
-
 function SiteHeader() {
   return (
     <header className="site-header">
       <SiteLink className="site-wordmark" href="/" aria-label="Trevor Warthman, home">TW</SiteLink>
-      <ConventionalNav />
       <a className="header-github" href="https://github.com/Trevor-Warthman" target="_blank" rel="noreferrer">GitHub <Arrow /></a>
     </header>
   )
@@ -103,9 +90,8 @@ function HomePage({ pathname, hash }: { pathname: string; hash: string }) {
       <SiteHeader />
       <main id="main" className="home-main">
         <div className="home-intro">
-          <p className="eyebrow">Software engineer · Columbus, Ohio</p>
           <h1>Trevor<br />Warthman</h1>
-          <p>Career, coding, and personal work.</p>
+          <p>Career, code, and personal projects.</p>
         </div>
         <SiteGraph pathname={pathname} hash={hash} full />
       </main>
@@ -118,12 +104,7 @@ function InternalLayout({ pathname, hash, children }: { pathname: string; hash: 
   return (
     <div className="internal-layout">
       <SiteHeader />
-      <section className="context-graph" aria-labelledby="context-graph-title">
-        <div className="context-graph__intro">
-          <p className="eyebrow">Current location</p>
-          <h2 id="context-graph-title">Related pages</h2>
-          <p>The current page is centered. Gold lines contain pages; dashed teal lines show references.</p>
-        </div>
+      <section className="context-graph" aria-label="Site navigation">
         <SiteGraph pathname={pathname} hash={hash} />
       </section>
       <main id="main" className="page-content">{children}</main>

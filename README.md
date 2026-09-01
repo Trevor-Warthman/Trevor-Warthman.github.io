@@ -2,7 +2,7 @@
 
 React and TypeScript portfolio built with Vite for free static hosting on GitHub Pages.
 
-The homepage is an interactive site graph. Internal pages retain a compact version of the same graph, with the current route highlighted. A conventional navigation fallback and a narrow-screen list use the same route data.
+The homepage is an interactive site graph. Every route renders the same connected graph with the current page centered, related nodes emphasized, and parent, child, and mention relationships styled separately. The graph is the primary internal navigation.
 
 ## Routes
 

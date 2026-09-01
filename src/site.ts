@@ -1,6 +1,6 @@
 export type GraphGroup = 'home' | 'career' | 'coding' | 'personal'
 export type NodeKind = 'home' | 'category' | 'page' | 'project' | 'external'
-export type EdgeKind = 'ownership' | 'mention' | 'affinity'
+export type EdgeKind = 'hierarchy' | 'mention' | 'affinity'
 
 export type SiteNode = {
   id: string
@@ -43,23 +43,24 @@ export const siteNodes: SiteNode[] = [
 ]
 
 export const siteEdges: SiteEdge[] = [
-  { id: 'home-career', source: 'home', target: 'career', kind: 'ownership' },
-  { id: 'home-coding', source: 'home', target: 'coding', kind: 'ownership' },
-  { id: 'home-personal', source: 'home', target: 'personal', kind: 'ownership' },
-  { id: 'career-resume', source: 'career', target: 'resume', kind: 'ownership' },
-  { id: 'career-experience', source: 'career', target: 'experience', kind: 'ownership' },
-  { id: 'career-work', source: 'career', target: 'professional-work', kind: 'ownership' },
+  { id: 'home-career', source: 'home', target: 'career', kind: 'hierarchy' },
+  { id: 'home-coding', source: 'home', target: 'coding', kind: 'hierarchy' },
+  { id: 'home-personal', source: 'home', target: 'personal', kind: 'hierarchy' },
+  { id: 'home-projects', source: 'home', target: 'projects', kind: 'hierarchy' },
+  { id: 'career-resume', source: 'career', target: 'resume', kind: 'hierarchy' },
+  { id: 'career-experience', source: 'career', target: 'experience', kind: 'hierarchy' },
+  { id: 'career-work', source: 'career', target: 'professional-work', kind: 'hierarchy' },
   { id: 'resume-experience', source: 'resume', target: 'experience', kind: 'mention' },
   { id: 'resume-work', source: 'resume', target: 'professional-work', kind: 'mention' },
-  { id: 'coding-projects', source: 'coding', target: 'projects', kind: 'ownership' },
-  { id: 'coding-pensieve', source: 'coding', target: 'pensieve', kind: 'ownership' },
-  { id: 'coding-chef', source: 'coding', target: 'chef', kind: 'ownership' },
-  { id: 'coding-chrome', source: 'coding', target: 'chrome', kind: 'ownership' },
-  { id: 'coding-earlier', source: 'coding', target: 'earlier-work', kind: 'ownership' },
-  { id: 'personal-about', source: 'personal', target: 'about', kind: 'ownership' },
-  { id: 'personal-kitchen', source: 'personal', target: 'kitchen', kind: 'ownership' },
-  { id: 'personal-castle', source: 'personal', target: 'castle', kind: 'ownership' },
-  { id: 'personal-dylan', source: 'personal', target: 'dylan', kind: 'ownership' },
+  { id: 'coding-projects', source: 'coding', target: 'projects', kind: 'hierarchy' },
+  { id: 'projects-pensieve', source: 'projects', target: 'pensieve', kind: 'hierarchy' },
+  { id: 'projects-chef', source: 'projects', target: 'chef', kind: 'hierarchy' },
+  { id: 'projects-chrome', source: 'projects', target: 'chrome', kind: 'hierarchy' },
+  { id: 'projects-earlier', source: 'projects', target: 'earlier-work', kind: 'hierarchy' },
+  { id: 'personal-about', source: 'personal', target: 'about', kind: 'hierarchy' },
+  { id: 'personal-kitchen', source: 'personal', target: 'kitchen', kind: 'hierarchy' },
+  { id: 'personal-castle', source: 'personal', target: 'castle', kind: 'hierarchy' },
+  { id: 'personal-dylan', source: 'personal', target: 'dylan', kind: 'hierarchy' },
   { id: 'pensieve-castle', source: 'pensieve', target: 'castle', kind: 'mention' },
   { id: 'chef-kitchen', source: 'chef', target: 'kitchen', kind: 'mention' },
   { id: 'about-dylan', source: 'about', target: 'dylan', kind: 'mention' },
@@ -80,4 +81,18 @@ export function neighborIds(id: string) {
     if (edge.target === id) return [edge.source]
     return []
   })
+}
+
+export function graphDistances(startId: string) {
+  const distances: Record<string, number> = { [startId]: 0 }
+  const queue = [startId]
+  while (queue.length) {
+    const current = queue.shift()!
+    for (const neighbor of neighborIds(current)) {
+      if (distances[neighbor] !== undefined) continue
+      distances[neighbor] = distances[current] + 1
+      queue.push(neighbor)
+    }
+  }
+  return distances
 }
