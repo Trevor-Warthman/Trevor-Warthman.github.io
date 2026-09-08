@@ -1,18 +1,13 @@
-import { KeyboardEvent, MouseEvent, useMemo, useState } from 'react'
-import { currentNodeId, neighborIds, siteEdges, siteNodes, SiteNode } from './site'
+import { MouseEvent, useMemo, useState } from 'react'
+import { currentNodeId, graphDistances, siteEdges, siteNodes, SiteEdge, SiteNode } from './site'
 import { navigate } from './router'
 
-type SiteGraphProps = {
-  pathname: string
-  hash: string
-  full?: boolean
-}
-
-type Point = { x: number; y: number; depth: number }
+type SiteGraphProps = { pathname: string; hash: string; full?: boolean }
+type Point = { x: number; y: number; distance: number; importance: number }
 type TransitionMap = Record<string, number>
 
-const groupAngles = { career: -150, coding: -30, personal: 90, home: 180 }
-const storageKey = 'tw.graphTransitions.v1'
+const storageKey = 'tw.graphTransitions.v2'
+const center = { x: 500, y: 305 }
 
 function readTransitions(): TransitionMap {
   try { return JSON.parse(window.localStorage.getItem(storageKey) ?? '{}') }
@@ -29,83 +24,81 @@ function recordTransition(source: string, target: string) {
   } catch { /* Navigation still works when storage is unavailable. */ }
 }
 
-function contextualNodes(activeId: string, full: boolean, expandedGroups: string[]) {
-  if (full) {
-    return siteNodes.filter((node) => (
-      node.id === 'home' || node.kind === 'category' ||
-      (node.featured && expandedGroups.includes(node.group))
-    ))
-  }
-  const visible = new Set([activeId, ...neighborIds(activeId)])
-  for (const id of [...visible]) neighborIds(id).forEach((neighbor) => visible.add(neighbor))
-  for (const group of expandedGroups) {
-    siteNodes.filter((node) => node.group === group && node.featured).forEach((node) => visible.add(node.id))
-  }
-  return siteNodes.filter((node) => visible.has(node.id)).slice(0, 12)
+function edgeImportance(edge: SiteEdge, activeId: string) {
+  if (edge.kind === 'mention') return .62
+  if (edge.source === activeId || edge.target === activeId) return 1
+  return .46
 }
 
-function positionsFor(nodes: SiteNode[], activeId: string, full: boolean) {
-  const points: Record<string, Point> = { [activeId]: { x: 500, y: 315, depth: 0 } }
-  if (full && activeId === 'home') {
-    const categories = nodes.filter((node) => node.kind === 'category')
-    categories.forEach((category) => {
-      const angle = groupAngles[category.group] * Math.PI / 180
-      points[category.id] = { x: 500 + Math.cos(angle) * 185, y: 315 + Math.sin(angle) * 175, depth: 1 }
-      const children = nodes.filter((node) => node.group === category.group && node.kind !== 'category')
-      children.forEach((child, index) => {
-        const spread = children.length === 1 ? 0 : (index / (children.length - 1) - .5) * 74
-        const childAngle = (groupAngles[category.group] + spread) * Math.PI / 180
-        points[child.id] = { x: 500 + Math.cos(childAngle) * 345, y: 315 + Math.sin(childAngle) * 270, depth: 2 }
-      })
-    })
-    return points
-  }
+function nodeImportance(node: SiteNode, activeId: string, distance: number) {
+  if (node.id === activeId) return 1
+  const directEdges = siteEdges.filter((edge) => (
+    (edge.source === activeId && edge.target === node.id) ||
+    (edge.target === activeId && edge.source === node.id)
+  ))
+  if (directEdges.length) return Math.max(...directEdges.map((edge) => edgeImportance(edge, activeId)))
+  return distance === 2 ? .42 : .24
+}
 
-  const direct = new Set(neighborIds(activeId).filter((id) => nodes.some((node) => node.id === id)))
-  const ringOne = nodes.filter((node) => direct.has(node.id))
-  const ringTwo = nodes.filter((node) => node.id !== activeId && !direct.has(node.id))
-  ringOne.forEach((node, index) => {
-    const angle = (-90 + index * 360 / Math.max(ringOne.length, 1)) * Math.PI / 180
-    points[node.id] = { x: 500 + Math.cos(angle) * 185, y: 315 + Math.sin(angle) * 165, depth: 1 }
+function positionsFor(activeId: string) {
+  const distances = graphDistances(activeId)
+  const points: Record<string, Point> = { [activeId]: { ...center, distance: 0, importance: 1 } }
+  const rings = new Map<number, SiteNode[]>()
+  siteNodes.filter((node) => node.id !== activeId).forEach((node) => {
+    const distance = Math.min(distances[node.id] ?? 3, 3)
+    rings.set(distance, [...(rings.get(distance) ?? []), node])
   })
-  ringTwo.forEach((node, index) => {
-    const angle = (-72 + index * 360 / Math.max(ringTwo.length, 1)) * Math.PI / 180
-    points[node.id] = { x: 500 + Math.cos(angle) * 335, y: 315 + Math.sin(angle) * 255, depth: 2 }
-  })
+  const radii = { 1: { x: 205, y: 145 }, 2: { x: 335, y: 235 }, 3: { x: 440, y: 278 } }
+  const offsets = { 1: -92, 2: -72, 3: -84 }
+  for (const [distance, ringNodes] of rings) {
+    const sorted = [...ringNodes].sort((a, b) => nodeImportance(b, activeId, distance) - nodeImportance(a, activeId, distance) || siteNodes.indexOf(a) - siteNodes.indexOf(b))
+    sorted.forEach((node, index) => {
+      const angle = (offsets[distance as 1 | 2 | 3] + index * 360 / sorted.length) * Math.PI / 180
+      const radius = radii[distance as 1 | 2 | 3]
+      points[node.id] = {
+        x: center.x + Math.cos(angle) * radius.x,
+        y: center.y + Math.sin(angle) * radius.y,
+        distance,
+        importance: nodeImportance(node, activeId, distance),
+      }
+    })
+  }
   return points
 }
 
-function NodeShape({ node, active }: { node: SiteNode; active: boolean }) {
-  if (node.kind === 'category') return <polygon className="graph-node__shape" points="0,-25 22,-12 22,12 0,25 -22,12 -22,-12" />
-  if (node.kind === 'external') return <rect className="graph-node__shape" x="-15" y="-15" width="30" height="30" transform="rotate(45)" />
-  if (node.kind === 'project') return <rect className="graph-node__shape" x="-18" y="-18" width="36" height="36" rx="8" />
-  return <circle className="graph-node__shape" r={active ? 25 : 18} />
+function relationshipClass(edge: SiteEdge, activeId: string) {
+  if (edge.kind === 'mention' || edge.kind === 'affinity') return edge.kind
+  if (edge.target === activeId) return 'parent'
+  return 'child'
+}
+
+function nodeRadius(node: SiteNode, point: Point) {
+  if (point.distance === 0) return 20
+  if (point.distance === 1) return node.kind === 'category' ? 15 : 13
+  if (point.distance === 2) return node.kind === 'category' ? 9 : 7
+  return 5
+}
+
+function NodeShape({ node, point }: { node: SiteNode; point: Point }) {
+  const radius = nodeRadius(node, point)
+  if (node.kind === 'external') return <rect className="graph-node__shape" x={-radius * .78} y={-radius * .78} width={radius * 1.56} height={radius * 1.56} transform="rotate(45)" />
+  return <circle className="graph-node__shape" r={radius} />
 }
 
 export function SiteGraph({ pathname, hash, full = false }: SiteGraphProps) {
   const activeId = currentNodeId(pathname, hash)
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(() => (
-    full && !window.matchMedia('(max-width: 620px)').matches ? ['career', 'coding', 'personal'] : []
-  ))
   const [transitions, setTransitions] = useState<TransitionMap>(() => readTransitions())
-  const nodes = useMemo(() => contextualNodes(activeId, full, expandedGroups), [activeId, full, expandedGroups])
-  const positions = useMemo(() => positionsFor(nodes, activeId, full), [nodes, activeId, full])
-  const visibleIds = new Set(nodes.map((node) => node.id))
-  const baseEdges = siteEdges.filter((edge) => visibleIds.has(edge.source) && visibleIds.has(edge.target))
-  const basePairs = new Set(baseEdges.map((edge) => [edge.source, edge.target].sort().join('>')))
-  const affinityEdges = Object.entries(transitions).flatMap(([key]) => {
+  const positions = useMemo(() => positionsFor(activeId), [activeId])
+  const basePairs = new Set(siteEdges.map((edge) => [edge.source, edge.target].sort().join('>')))
+  const affinityEdges: SiteEdge[] = Object.keys(transitions).flatMap((key) => {
     const [source, target] = key.split('>')
     const pair = [source, target].sort().join('>')
-    if (!visibleIds.has(source) || !visibleIds.has(target) || basePairs.has(pair)) return []
-    return [{ id: `affinity-${pair}`, source, target, kind: 'affinity' as const }]
+    if (!positions[source] || !positions[target] || basePairs.has(pair)) return []
+    return [{ id: `affinity-${pair}`, source, target, kind: 'affinity' }]
   })
-  const edges = [...baseEdges, ...affinityEdges]
+  const edges = [...siteEdges, ...affinityEdges]
 
   const followNode = (node: SiteNode) => {
-    if (node.kind === 'category') {
-      setExpandedGroups((current) => current.includes(node.id) ? current.filter((id) => id !== node.id) : [...current, node.id])
-      return
-    }
     if (!node.href) return
     recordTransition(activeId, node.id)
     setTransitions(readTransitions())
@@ -119,75 +112,35 @@ export function SiteGraph({ pathname, hash, full = false }: SiteGraphProps) {
     followNode(node)
   }
 
-  const handleKeyDown = (event: KeyboardEvent<Element>, node: SiteNode) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return
-    event.preventDefault()
-    followNode(node)
-  }
-
   return (
     <div className={`site-graph ${full ? 'site-graph--full' : 'site-graph--context'}`}>
-      <svg viewBox="0 0 1000 630" role="navigation" aria-label={full ? 'Site graph' : 'Related pages graph'}>
+      <svg viewBox="0 0 1000 610" role="navigation" aria-label="Site navigation graph">
         <g aria-hidden="true">
           {edges.map((edge) => {
             const source = positions[edge.source]
             const target = positions[edge.target]
             if (!source || !target) return null
             const visits = (transitions[`${edge.source}>${edge.target}`] ?? 0) + (transitions[`${edge.target}>${edge.source}`] ?? 0)
-            const baseWidth = edge.kind === 'ownership' ? 2 : edge.kind === 'mention' ? 1.7 : 1.5
-            const visitWidth = Math.min(visits, 8) * (edge.kind === 'affinity' ? 0.55 : 0.45)
-            return <line key={edge.id} className={`graph-edge graph-edge--${edge.kind}`} style={{ strokeWidth: baseWidth + visitWidth }} x1={source.x} y1={source.y} x2={target.x} y2={target.y} />
+            const activeEdge = edge.source === activeId || edge.target === activeId
+            const baseWidth = activeEdge ? 2.8 : edge.kind === 'mention' ? 1.2 : .8
+            return <line key={edge.id} className={`graph-edge graph-edge--${relationshipClass(edge, activeId)} ${activeEdge ? 'is-direct' : ''}`} style={{ strokeWidth: baseWidth + Math.min(visits, 8) * .28 }} x1={source.x} y1={source.y} x2={target.x} y2={target.y} />
           })}
         </g>
         <g>
-          {nodes.map((node) => {
+          {siteNodes.map((node) => {
             const point = positions[node.id]
-            if (!point) return null
             const active = node.id === activeId
-            const content = (
-              <g className={`graph-node graph-node--${node.group} graph-node--${node.kind} ${active ? 'is-active' : ''} graph-node--depth-${point.depth}`} transform={`translate(${point.x} ${point.y})`}>
-                <circle className="graph-node__hit" r="48" />
-                {active && <circle className="graph-node__active-ring" r="34" />}
-                <NodeShape node={node} active={active} />
-                <text className="graph-node__label" textAnchor="middle" y="49">{node.shortLabel ?? node.label}{node.external ? ' ↗' : ''}</text>
-              </g>
-            )
-            if (node.kind === 'category') {
-              return <g key={node.id} role="button" tabIndex={0} aria-pressed={expandedGroups.includes(node.id)} aria-label={`${node.label} category, ${expandedGroups.includes(node.id) ? 'collapse' : 'expand'}`} className="graph-category-control" onClick={(event) => handleClick(event, node)} onKeyDown={(event) => handleKeyDown(event, node)}>{content}</g>
+            const labelOffset = nodeRadius(node, point) + (point.distance <= 1 ? 19 : 16)
+            const content = <g className={`graph-node graph-node--${node.group} graph-node--${node.kind} graph-node--distance-${point.distance} ${active ? 'is-active' : ''}`} style={{ opacity: Math.max(.32, point.importance) }} transform={`translate(${point.x} ${point.y})`}><circle className="graph-node__hit" r="62" />{active && <circle className="graph-node__active-ring" r="29" />}<NodeShape node={node} point={point} /><text className="graph-node__label" textAnchor="middle" y={labelOffset}>{node.shortLabel ?? node.label}{node.external ? ' ↗' : ''}</text></g>
+            if (!node.href) {
+              const destination = siteNodes.find((candidate) => candidate.group === node.group && candidate.href)
+              return <g key={node.id} role="link" tabIndex={0} aria-label={`${node.label}, section`} onClick={() => destination && followNode(destination)} onKeyDown={(event) => { if ((event.key === 'Enter' || event.key === ' ') && destination) followNode(destination) }}>{content}</g>
             }
-            return <a key={node.id} className="graph-node-link" href={node.href} target={node.external ? '_blank' : undefined} rel={node.external ? 'noreferrer' : undefined} aria-label={`${node.label}${node.external ? ', external site' : ''}${active ? ', current page' : ''}`} onClick={(event) => handleClick(event, node)} onKeyDown={(event) => handleKeyDown(event, node)}>{content}</a>
+            return <a key={node.id} href={node.href} target={node.external ? '_blank' : undefined} rel={node.external ? 'noreferrer' : undefined} aria-label={`${node.label}${node.external ? ', external site' : ''}${active ? ', current page' : ''}`} onClick={(event) => handleClick(event, node)}>{content}</a>
           })}
         </g>
       </svg>
-
-      <div className="graph-legend" aria-label="Graph legend">
-        <span><i className="legend-node legend-node--category" /> Category</span>
-        <span><i className="legend-node" /> Page</span>
-        <span><i className="legend-node legend-node--external" /> External</span>
-        <span><i className="legend-line legend-line--owns" /> Contains</span>
-        <span><i className="legend-line legend-line--mentions" /> Mentions</span>
-        <span><i className="legend-line legend-line--visited" /> Visited path</span>
-      </div>
-
-      <details className="graph-directory">
-        <summary>Directory</summary>
-        <div className="graph-directory__groups">
-          {(['career', 'coding', 'personal'] as const).map((group) => (
-            <section className={`directory-group directory-group--${group}`} key={group}>
-              <h3>{group[0].toUpperCase() + group.slice(1)}</h3>
-              {siteNodes.filter((node) => node.group === group && node.href).map((node) => (
-                <a key={node.id} href={node.href} target={node.external ? '_blank' : undefined} rel={node.external ? 'noreferrer' : undefined} onClick={(event) => {
-                  recordTransition(activeId, node.id)
-                  if (node.external) return
-                  event.preventDefault()
-                  setTransitions(readTransitions())
-                  navigate(node.href!)
-                }}>{node.label}{node.external ? ' ↗' : ''}</a>
-              ))}
-            </section>
-          ))}
-        </div>
-      </details>
+      <div className="graph-legend" aria-label="Relationship legend"><span><i className="legend-line legend-line--parent" /> Parent</span><span><i className="legend-line legend-line--child" /> Child</span><span><i className="legend-line legend-line--mention" /> Mention</span></div>
     </div>
   )
 }
