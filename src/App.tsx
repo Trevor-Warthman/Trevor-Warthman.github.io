@@ -298,6 +298,12 @@ function FitnessPage() {
       <PageHeader label="Personal" title="Fitness" intro="Calories, activity, and weight, synced from Apple Health." />
       <section className="content-section">
         <HealthDashboard />
+        <p className="hd-external-link">
+          <a href="https://jarvis.tail690ef5.ts.net:8443/" target="_blank" rel="noreferrer">
+            Full FreeReps dashboard (all 70+ metrics, Grafana-style charts) <Arrow />
+          </a>
+          <br />Private — only loads on Trevor's Tailscale network.
+        </p>
       </section>
       <section className="content-section empty-state" id="fitness-roadmap">
         <p className="section-label">What's next</p>

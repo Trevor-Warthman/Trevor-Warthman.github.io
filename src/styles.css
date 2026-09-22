@@ -285,3 +285,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; }
 @media (max-width: 620px) {
   .hd-settings form { grid-template-columns: 1fr; }
 }
+.hd-external-link { max-width: 720px; margin: 1.5rem auto 0; color: var(--muted); font-family: var(--utility); font-size: .68rem; letter-spacing: .04em; text-align: center; line-height: 1.7; }
+.hd-external-link a { color: var(--teal); text-decoration: none; }
+.hd-external-link a:hover { color: var(--rust); }
