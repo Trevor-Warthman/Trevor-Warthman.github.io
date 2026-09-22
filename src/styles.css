@@ -221,3 +221,48 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Health dashboard: deliberately a dark, iOS-widget-styled card inside the
+   site's light page shell, matching the original Shortcut "Weekly Calories" card. */
+.hd-card { max-width: 720px; margin: 0 auto; padding: 1.5rem; color: #f2f2f2; background: #0b0e0d; border-radius: 22px; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--utility), sans-serif; }
+.hd-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.hd-topbar h2 { margin: 0; font-size: 1.3rem; font-weight: 700; color: #fff; }
+.hd-refresh { display: grid; place-items: center; width: 34px; height: 34px; color: #fff; background: #2f6fed; border: none; border-radius: 50%; font-size: .95rem; cursor: pointer; }
+.hd-range-tabs { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.25rem; }
+.hd-range-tabs button { padding: .4rem .85rem; color: #cfd6d3; background: rgba(255, 255, 255, .06); border: none; border-radius: 999px; font-size: .78rem; cursor: pointer; }
+.hd-range-tabs button.is-active { color: #0b0e0d; background: #fff; font-weight: 700; }
+.hd-table-wrap { overflow-x: auto; border-radius: 16px; background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02)); }
+.hd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.hd-table th, .hd-table td { padding: .7rem .9rem; text-align: right; white-space: nowrap; }
+.hd-table thead th { color: #9aa39e; font-weight: 600; font-size: .8rem; text-align: right; }
+.hd-row-label { position: sticky; left: 0; z-index: 1; color: #cfd6d3; text-align: left !important; background: #0b0e0d; }
+.hd-table thead .hd-row-label { background: #0b0e0d; }
+.hd-row-strong .hd-row-label, .hd-row-strong td { font-weight: 700; }
+.hd-row-strong td, .hd-row-strong th.hd-row-label { border-top: 1px solid rgba(255, 255, 255, .08); }
+.hd-pos { color: #4ade80; }
+.hd-neg { color: #f28b82; }
+.hd-note { margin: 1rem 0 0; color: #8a938e; font-size: .78rem; line-height: 1.5; }
+.hd-details-heading { margin: 1.75rem 0 .5rem; font-size: 1.1rem; font-weight: 700; color: #fff; }
+.hd-details { margin: 0; }
+.hd-details > div { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid rgba(255, 255, 255, .07); }
+.hd-details dt { color: #b7beba; font-size: .85rem; font-weight: 400; }
+.hd-details dd { margin: 0; color: #fff; font-size: .95rem; font-weight: 600; text-align: right; }
+.hd-formulas { margin: 1rem 0 0; padding-top: .75rem; color: #7f8783; font-size: .74rem; line-height: 1.7; border-top: 1px solid rgba(255, 255, 255, .07); }
+.hd-settings { margin-top: 1.75rem; }
+.hd-settings summary { color: #9aa39e; font-size: .82rem; cursor: pointer; }
+.hd-settings form { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .85rem; }
+.hd-settings label { display: flex; flex-direction: column; gap: .3rem; color: #b7beba; font-size: .75rem; }
+.hd-settings input { padding: .5rem .6rem; color: #fff; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); border-radius: 8px; }
+.hd-btn { grid-column: 1 / -1; padding: .6rem; color: #0b0e0d; background: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.hd-disconnect { margin-top: 1rem; padding: 0; color: #7f8783; background: none; border: none; font-size: .72rem; text-decoration: underline; cursor: pointer; }
+.hd-error { color: #f28b82; font-size: .85rem; }
+.hd-token-prompt p { margin: 0 0 1rem; color: #cfd6d3; font-size: .9rem; line-height: 1.6; }
+.hd-token-row { display: flex; gap: .5rem; }
+.hd-token-row input { flex: 1; padding: .6rem .7rem; color: #fff; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12); border-radius: 8px; }
+
+@media (max-width: 620px) {
+  .hd-settings form { grid-template-columns: 1fr; }
+}
+.hd-external-link { max-width: 720px; margin: 1.5rem auto 0; color: var(--muted); font-family: var(--utility); font-size: .68rem; letter-spacing: .04em; text-align: center; line-height: 1.7; }
+.hd-external-link a { color: var(--teal); text-decoration: none; }
+.hd-external-link a:hover { color: var(--rust); }

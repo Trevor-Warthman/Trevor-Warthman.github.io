@@ -2,6 +2,7 @@ import { ReactNode, useEffect } from 'react'
 import { earlierProjects, projects } from './projects'
 import { SiteGraph } from './SiteGraph'
 import { navigate, SiteLink, useLocation } from './router'
+import { HealthDashboard } from './health/HealthDashboard'
 
 const Arrow = () => <span aria-hidden="true">↗</span>
 
@@ -272,6 +273,35 @@ function AboutPage() {
   )
 }
 
+function FitnessPage() {
+  return (
+    <>
+      <PageHeader label="Personal" title="Fitness" intro="Calories, activity, and weight, synced from Apple Health." />
+      <section className="content-section">
+        <HealthDashboard />
+        <p className="hd-external-link">
+          <a href="https://jarvis.tail690ef5.ts.net:8443/" target="_blank" rel="noreferrer">
+            Full FreeReps dashboard (all 70+ metrics, Grafana-style charts) <Arrow />
+          </a>
+          <br />Private — only loads on Trevor's Tailscale network.
+        </p>
+      </section>
+      <section className="content-section empty-state" id="fitness-roadmap">
+        <p className="section-label">What's next</p>
+        <h2>More rows, more pages</h2>
+        <p>
+          Planned: a sparkline per row so a week's trend is visible at a glance; a workouts row
+          (type, duration, heart-rate zones) once more than active-energy is tracked; a protein/macros
+          row alongside calories; and a "progress score" blending the calorie and weight trends into
+          one weekly grade. Related pages under this one: a workouts-only page, a weight-only page
+          with the full history chart, and a public read-only page fed by a periodic export instead
+          of a live Tailscale connection, so it works for anyone, not just Trevor.
+        </p>
+      </section>
+    </>
+  )
+}
+
 function KitchenPage() {
   return (
     <>
@@ -294,6 +324,7 @@ function routeTitle(pathname: string) {
   if (pathname.startsWith('/projects/')) return 'Project — Trevor Warthman'
   if (pathname === '/about') return 'About — Trevor Warthman'
   if (pathname === '/kitchen') return 'Kitchen — Trevor Warthman'
+  if (pathname === '/fitness') return 'Fitness — Trevor Warthman'
   return 'Page not found — Trevor Warthman'
 }
 
@@ -316,6 +347,7 @@ function App() {
   else if (pathname.startsWith('/projects/')) page = <ProjectPage slug={pathname.split('/').pop()!} />
   else if (pathname === '/about') page = <AboutPage />
   else if (pathname === '/kitchen') page = <KitchenPage />
+  else if (pathname === '/fitness') page = <FitnessPage />
   else page = <NotFoundPage />
   return <InternalLayout {...effectiveLocation}>{page}</InternalLayout>
 }
