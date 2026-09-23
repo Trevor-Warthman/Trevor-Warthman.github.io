@@ -45,6 +45,10 @@ function syncAgeLabel(lastSyncAt: string | null): { text: string; className: str
 function rangeNounFor(range: SummaryRange) {
   return range === 'day' ? 'Daily' : range === 'week' ? 'Weekly' : range === 'month' ? 'Monthly' : range === 'year' ? 'Yearly' : 'All-Time'
 }
+// For headings that read as a sentence fragment ("Averages this week"), not a label.
+function periodPhrase(range: SummaryRange) {
+  return range === 'day' ? 'today' : range === 'week' ? 'this week' : range === 'month' ? 'this month' : range === 'year' ? 'this year' : 'all-time'
+}
 // True whenever a bucket has any unlogged day in it: day buckets are 0/1 or 1/1, so
 // this is exactly "missing" for those; month buckets (year/all-time) can be partial.
 function hasGap(b: Bucket) {
@@ -62,8 +66,16 @@ function RowCell({ rowKey, bucket }: { rowKey: (typeof ROW_KEYS)[number]; bucket
     case 'budgetUsed': return <>{bucket.budgetUsedPct === null ? '—' : `${fmt(bucket.budgetUsedPct)}%`}</>
     case 'food': return <>{fmt(bucket.foodKcal)}</>
     case 'active': return <>{fmt(bucket.activeKcal)}</>
-    case 'dailyBalance': return <span className={balanceClass(bucket.dailyBalanceKcal)}>{fmtSigned(bucket.dailyBalanceKcal)}</span>
-    case 'balance': return <span className={balanceClass(bucket.cumulativeBalanceKcal)}>{fmtSigned(bucket.cumulativeBalanceKcal)}</span>
+    // The in-progress bucket (today, or the current month in year/all-time view)
+    // hasn't finished, so its daily balance isn't a real number yet and it never
+    // contributes to the running balance -- matches the original mockup's "In
+    // progress" / "—" treatment instead of showing a number that will still change.
+    case 'dailyBalance': return bucket.isComplete
+      ? <span className={balanceClass(bucket.dailyBalanceKcal)}>{fmtSigned(bucket.dailyBalanceKcal)}</span>
+      : <span className="hd-in-progress">In progress</span>
+    case 'balance': return bucket.isComplete
+      ? <span className={balanceClass(bucket.cumulativeBalanceKcal)}>{fmtSigned(bucket.cumulativeBalanceKcal)}</span>
+      : <span className="hd-in-progress">—</span>
   }
 }
 
@@ -115,8 +127,13 @@ function MobileDayCard({ bucket, range, onMarked, onOpenModal }: {
       onClick={clickableMonth ? () => onOpenModal(bucket) : undefined}
     >
       <div className="hd-mobile-day-head">
-        <span className="hd-mobile-day-label">{bucket.label}</span>
-        <span className={`hd-mobile-day-balance ${balanceClass(bucket.dailyBalanceKcal)}`}>{fmtSigned(bucket.dailyBalanceKcal)}</span>
+        <span className="hd-mobile-day-label">
+          {bucket.label}
+          {!bucket.isComplete && <span className="hd-today-badge">{isDayGrain(range) ? 'TODAY' : 'IN PROGRESS'}</span>}
+        </span>
+        {bucket.isComplete
+          ? <span className={`hd-mobile-day-balance ${balanceClass(bucket.dailyBalanceKcal)}`}>{fmtSigned(bucket.dailyBalanceKcal)}</span>
+          : <span className="hd-mobile-day-balance hd-in-progress">In progress</span>}
       </div>
       {missing && (
         <div className="hd-missing-note">
@@ -131,10 +148,13 @@ function MobileDayCard({ bucket, range, onMarked, onOpenModal }: {
         <div><span>Food</span><strong>{fmt(bucket.foodKcal)}</strong></div>
         <div><span>Active</span><strong>{fmt(bucket.activeKcal)}</strong></div>
         <div><span>Budget</span><strong>{bucket.budgetUsedPct === null ? '—' : `${fmt(bucket.budgetUsedPct)}%`}</strong></div>
+        {!isDayGrain(range) && bucket.weightLb !== null && <div><span>Avg weight</span><strong>{bucket.weightLb} lb</strong></div>}
       </div>
       <div className="hd-mobile-day-balance-row">
         <span>Running balance</span>
-        <strong className={balanceClass(bucket.cumulativeBalanceKcal)}>{fmtSigned(bucket.cumulativeBalanceKcal)}</strong>
+        {bucket.isComplete
+          ? <strong className={balanceClass(bucket.cumulativeBalanceKcal)}>{fmtSigned(bucket.cumulativeBalanceKcal)}</strong>
+          : <strong className="hd-in-progress">—</strong>}
       </div>
     </div>
   )
@@ -232,8 +252,20 @@ export function HealthDashboard() {
 
       {summary && (() => {
         const gapBuckets = summary.buckets.filter(hasGap)
+        const anyMissing = summary.details.totalCompleteDayCount > summary.details.loggedDayCount
         return (
         <>
+          <h3 className="hd-details-heading hd-details-heading-first">Averages, {periodPhrase(range)}</h3>
+          <dl className="hd-details hd-averages">
+            <div><dt>Days logged</dt><dd>{summary.details.loggedDayCount} of {summary.details.totalCompleteDayCount}</dd></div>
+            <div><dt>Avg net / day</dt><dd>{summary.details.averageNetKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageNetKcalPerLoggedDay)} kcal`}</dd></div>
+            <div><dt>Avg food / day</dt><dd>{summary.details.averageFoodKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageFoodKcalPerLoggedDay)} kcal`}</dd></div>
+            <div><dt>Avg active / day</dt><dd>{summary.details.averageActiveKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageActiveKcalPerLoggedDay)} kcal`}</dd></div>
+          </dl>
+          <p className="hd-formulas hd-formulas-top">
+            Averaged over only the days actually logged {periodPhrase(range)} — missing days are excluded entirely, not counted as zero or as a real low day, so this stays accurate even with sparse logging.
+          </p>
+
           {gapBuckets.length > 0 && (
             <p className="hd-missing-banner">
               ⚠ Missing data: {gapBuckets.length} {isDayGrain(range) ? (gapBuckets.length === 1 ? 'day' : 'days') : (gapBuckets.length === 1 ? 'month' : 'months')} with under 1,400 kcal logged this {range === 'all' ? 'all-time view' : range}, excluded from averages.
@@ -255,6 +287,7 @@ export function HealthDashboard() {
                         onClick={clickableMonth ? () => setModalBucket(b) : undefined}
                       >
                         {b.label}
+                        {!b.isComplete && <span className="hd-today-badge">{isDayGrain(range) ? 'TODAY' : 'IN PROGRESS'}</span>}
                         {missing && isDayGrain(range) && <MarkRealButton day={b.periodStart} onMarked={load} />}
                       </th>
                     )
@@ -268,6 +301,12 @@ export function HealthDashboard() {
                     {summary.buckets.map((b) => <td key={b.periodStart} className={hasGap(b) ? 'hd-missing' : ''}><RowCell rowKey={key} bucket={b} /></td>)}
                   </tr>
                 ))}
+                {!isDayGrain(range) && (
+                  <tr>
+                    <th className="hd-row-label">Avg weight</th>
+                    {summary.buckets.map((b) => <td key={b.periodStart} className={hasGap(b) ? 'hd-missing' : ''}>{b.weightLb === null ? '—' : `${b.weightLb} lb`}</td>)}
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -281,33 +320,25 @@ export function HealthDashboard() {
           {modalBucket && <MonthGapModal bucket={modalBucket} onClose={() => setModalBucket(null)} />}
 
           <h3 className="hd-details-heading">Details</h3>
+          {anyMissing && (
+            <p className="hd-affected-note">Orange fields below include missing days in their totals and read low as a result. Daily net target, {rangeNounFor(range).toLowerCase()} net budget, maintenance reference, and the averages above are unaffected.</p>
+          )}
           <dl className="hd-details">
             <div><dt>Daily net target</dt><dd>{fmt(summary.details.dailyTargetKcal)} kcal</dd></div>
-            <div><dt>Completed net / budget</dt><dd>{fmt(summary.details.completedNetKcal)} / {fmt(summary.details.completedBudgetKcal)} kcal</dd></div>
-            <div><dt>Food &middot; completed / incl. today</dt><dd>{fmt(summary.details.foodCompletedKcal)} / {fmt(summary.details.foodInclTodayKcal)} kcal</dd></div>
-            <div><dt>Active &middot; completed / incl. today</dt><dd>{fmt(summary.details.activeCompletedKcal)} / {fmt(summary.details.activeInclTodayKcal)} kcal</dd></div>
+            <div><dt>Completed net / budget</dt><dd className={anyMissing ? 'hd-affected' : ''}>{fmt(summary.details.completedNetKcal)} / {fmt(summary.details.completedBudgetKcal)} kcal</dd></div>
+            <div><dt>Food &middot; completed / incl. today</dt><dd className={anyMissing ? 'hd-affected' : ''}>{fmt(summary.details.foodCompletedKcal)} / {fmt(summary.details.foodInclTodayKcal)} kcal</dd></div>
+            <div><dt>Active &middot; completed / incl. today</dt><dd className={anyMissing ? 'hd-affected' : ''}>{fmt(summary.details.activeCompletedKcal)} / {fmt(summary.details.activeInclTodayKcal)} kcal</dd></div>
             <div><dt>{rangeNounFor(range)} net budget</dt><dd>{fmt(summary.details.periodNetBudgetKcal)} kcal</dd></div>
-            <div><dt>Net budget left, incl. today</dt><dd>{fmt(summary.details.netBudgetLeftInclTodayKcal)} kcal</dd></div>
-            <div><dt>Per remaining day</dt><dd>{summary.details.perRemainingDayKcal === null ? '—' : `${fmt(summary.details.perRemainingDayKcal)} kcal/day`}</dd></div>
+            <div><dt>Net budget left, incl. today</dt><dd className={anyMissing ? 'hd-affected' : ''}>{fmt(summary.details.netBudgetLeftInclTodayKcal)} kcal</dd></div>
+            <div><dt>Per remaining day</dt><dd className={anyMissing ? 'hd-affected' : ''}>{summary.details.perRemainingDayKcal === null ? '—' : `${fmt(summary.details.perRemainingDayKcal)} kcal/day`}</dd></div>
             <div><dt>Maintenance reference</dt><dd>{fmt(summary.details.maintenanceKcal)} kcal/day</dd></div>
-            <div><dt>Deficit / expected deficit</dt><dd>{fmt(summary.details.deficitKcal)} / {fmt(summary.details.expectedDeficitKcal)} kcal</dd></div>
+            <div><dt>Deficit / expected deficit</dt><dd className={anyMissing ? 'hd-affected' : ''}>{fmt(summary.details.deficitKcal)} / {fmt(summary.details.expectedDeficitKcal)} kcal</dd></div>
           </dl>
           <p className="hd-formulas">
             Net = Food &minus; Active<br />
             Daily balance = {fmt(summary.details.dailyTargetKcal)} &minus; Net<br />
             Balance = total Daily balance for completed periods<br />
             Budget used = Net &divide; net budget &times; 100
-          </p>
-
-          <h3 className="hd-details-heading">Averages (days actually logged)</h3>
-          <dl className="hd-details">
-            <div><dt>Days logged</dt><dd>{summary.details.loggedDayCount} of {summary.details.totalCompleteDayCount}</dd></div>
-            <div><dt>Avg net / day</dt><dd>{summary.details.averageNetKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageNetKcalPerLoggedDay)} kcal`}</dd></div>
-            <div><dt>Avg food / day</dt><dd>{summary.details.averageFoodKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageFoodKcalPerLoggedDay)} kcal`}</dd></div>
-            <div><dt>Avg active / day</dt><dd>{summary.details.averageActiveKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageActiveKcalPerLoggedDay)} kcal`}</dd></div>
-          </dl>
-          <p className="hd-formulas">
-            Missing days (under 1,400 kcal logged, unless marked real) are excluded from these averages entirely — not counted as zero, not counted as a real low day.
           </p>
 
           <h3 className="hd-details-heading">Weight</h3>

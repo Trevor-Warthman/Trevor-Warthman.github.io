@@ -21,6 +21,9 @@ export type Bucket = {
   isMissing: boolean
   loggedDayCount: number
   totalDayCount: number
+  // Average of daily weight samples within the bucket, null if none logged. Only
+  // populated for month-grain buckets (year/all-time views).
+  weightLb: number | null
 }
 
 export type Details = {

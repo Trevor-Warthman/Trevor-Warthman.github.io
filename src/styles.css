@@ -292,6 +292,33 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; }
 .hd-modal p { margin: 0 0 .5rem; font-size: .85rem; line-height: 1.5; color: #d7dcda; }
 .hd-modal-hint { color: #8a938e; font-size: .76rem; }
 
+/* Today/in-progress treatment: the current bucket (today, or the current month in
+   year/all-time view) hasn't finished, so its balance is shown as a state, not a
+   number that will still change -- matches the original mockup. */
+.hd-today-badge { display: block; margin-top: .15rem; color: #6ea8fe; font-size: .62rem; font-weight: 700; letter-spacing: .05em; }
+.hd-in-progress { color: #7f8783; font-weight: 600; }
+
+/* Gap-affected Details fields: sums that include missing days read low as a result,
+   so they're called out in amber; unaffected fields (targets, budgets that don't
+   depend on logged data, and the logged-day averages) stay the normal color. */
+.hd-affected-note { margin: 0 0 .75rem; color: #8a938e; font-size: .74rem; line-height: 1.5; }
+.hd-details dd.hd-affected { color: #ffcf86; }
+
+.hd-details-heading-first { margin-top: 0; }
+.hd-formulas-top { border-top: none; padding-top: 0; margin-bottom: 1.5rem; }
+.hd-averages { padding-bottom: .5rem; }
+
+@media (min-width: 621px) {
+  /* Desktop gets real room: wider card, and Details/Averages/Weight read as
+     horizontal stat rows instead of one long stacked list, to differentiate the
+     view from the cramped mobile layout. */
+  .hd-card { max-width: 1080px; }
+  .hd-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 2rem; }
+  .hd-details > div { flex-direction: column; align-items: flex-start; gap: .25rem; }
+  .hd-details dd { text-align: left; }
+  .hd-averages { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
 @media (max-width: 620px) {
   .hd-settings form { grid-template-columns: 1fr; }
   .hd-desktop-only { display: none; }
