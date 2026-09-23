@@ -255,16 +255,20 @@ export function HealthDashboard() {
         const anyMissing = summary.details.totalCompleteDayCount > summary.details.loggedDayCount
         return (
         <>
-          <h3 className="hd-details-heading hd-details-heading-first">Averages, {periodPhrase(range)}</h3>
-          <dl className="hd-details hd-averages">
-            <div><dt>Days logged</dt><dd>{summary.details.loggedDayCount} of {summary.details.totalCompleteDayCount}</dd></div>
-            <div><dt>Avg net / day</dt><dd>{summary.details.averageNetKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageNetKcalPerLoggedDay)} kcal`}</dd></div>
-            <div><dt>Avg food / day</dt><dd>{summary.details.averageFoodKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageFoodKcalPerLoggedDay)} kcal`}</dd></div>
-            <div><dt>Avg active / day</dt><dd>{summary.details.averageActiveKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageActiveKcalPerLoggedDay)} kcal`}</dd></div>
-          </dl>
-          <p className="hd-formulas hd-formulas-top">
-            Averaged over only the days actually logged {periodPhrase(range)} — missing days are excluded entirely, not counted as zero or as a real low day, so this stays accurate even with sparse logging.
-          </p>
+          {range !== 'day' && (
+            <>
+              <h3 className="hd-details-heading hd-details-heading-first">Averages, {periodPhrase(range)}</h3>
+              <dl className="hd-details hd-averages">
+                <div><dt>Days logged</dt><dd>{summary.details.loggedDayCount} of {summary.details.totalCompleteDayCount}</dd></div>
+                <div><dt>Avg net / day</dt><dd>{summary.details.averageNetKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageNetKcalPerLoggedDay)} kcal`}</dd></div>
+                <div><dt>Avg food / day</dt><dd>{summary.details.averageFoodKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageFoodKcalPerLoggedDay)} kcal`}</dd></div>
+                <div><dt>Avg active / day</dt><dd>{summary.details.averageActiveKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageActiveKcalPerLoggedDay)} kcal`}</dd></div>
+              </dl>
+              <p className="hd-formulas hd-formulas-top">
+                Averaged over only the days actually logged {periodPhrase(range)} — missing days are excluded entirely, not counted as zero or as a real low day, so this stays accurate even with sparse logging.
+              </p>
+            </>
+          )}
 
           {gapBuckets.length > 0 && (
             <p className="hd-missing-banner">
@@ -321,7 +325,9 @@ export function HealthDashboard() {
 
           <h3 className="hd-details-heading">Details</h3>
           {anyMissing && (
-            <p className="hd-affected-note">Orange fields below include missing days in their totals and read low as a result. Daily net target, {rangeNounFor(range).toLowerCase()} net budget, maintenance reference, and the averages above are unaffected.</p>
+            <p className="hd-affected-note">
+              Orange fields below include missing days in their totals and read low as a result. Daily net target, {rangeNounFor(range).toLowerCase()} net budget, and maintenance reference are unaffected{range !== 'day' && ', as are the averages above'}.
+            </p>
           )}
           <dl className="hd-details">
             <div><dt>Daily net target</dt><dd>{fmt(summary.details.dailyTargetKcal)} kcal</dd></div>
