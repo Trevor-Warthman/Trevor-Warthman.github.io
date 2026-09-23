@@ -38,6 +38,7 @@ export const siteNodes: SiteNode[] = [
   { id: 'personal', label: 'Personal', group: 'personal', kind: 'category' },
   { id: 'about', label: 'About', href: '/about', group: 'personal', kind: 'page', featured: true },
   { id: 'kitchen', label: 'Kitchen', href: '/kitchen', group: 'personal', kind: 'page', featured: true },
+  { id: 'fitness', label: 'Fitness', href: '/fitness', group: 'personal', kind: 'page', featured: true },
   { id: 'castle', label: 'Infinity Castle Saga', shortLabel: 'Infinity Castle', href: 'https://pensieve.click/winking-skeever', group: 'personal', kind: 'external', featured: true, external: true },
   { id: 'dylan', label: 'Dylan Ecker', href: 'https://dylanecker.space', group: 'personal', kind: 'external', featured: true, external: true },
 ]
@@ -59,6 +60,7 @@ export const siteEdges: SiteEdge[] = [
   { id: 'projects-earlier', source: 'projects', target: 'earlier-work', kind: 'hierarchy' },
   { id: 'personal-about', source: 'personal', target: 'about', kind: 'hierarchy' },
   { id: 'personal-kitchen', source: 'personal', target: 'kitchen', kind: 'hierarchy' },
+  { id: 'personal-fitness', source: 'personal', target: 'fitness', kind: 'hierarchy' },
   { id: 'personal-castle', source: 'personal', target: 'castle', kind: 'hierarchy' },
   { id: 'personal-dylan', source: 'personal', target: 'dylan', kind: 'hierarchy' },
   { id: 'pensieve-castle', source: 'pensieve', target: 'castle', kind: 'mention' },
