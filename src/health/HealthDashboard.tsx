@@ -1,8 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react'
-import {
-  Bucket, Settings, SettingsUpdate, Summary, SummaryRange,
-  clearToken, fetchSettings, fetchSummary, getToken, setToken, updateSettings,
-} from './api'
+import { Bucket, Settings, SettingsUpdate, Summary, SummaryRange, fetchSettings, fetchSummary, updateSettings } from './api'
 
 const RANGES: { value: SummaryRange; label: string }[] = [
   { value: 'day', label: 'Day' },
@@ -60,25 +57,6 @@ function RowCell({ rowKey, bucket }: { rowKey: (typeof ROW_KEYS)[number]; bucket
   }
 }
 
-function TokenPrompt({ onSaved }: { onSaved: () => void }) {
-  const [value, setValue] = useState('')
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault()
-    if (!value.trim()) return
-    setToken(value.trim())
-    onSaved()
-  }
-  return (
-    <form className="hd-token-prompt" onSubmit={handleSubmit}>
-      <p>This page reads live from Jarvis over Tailscale, so it only works here, on the tailnet, with the dashboard token.</p>
-      <div className="hd-token-row">
-        <input type="password" placeholder="Dashboard token" value={value} onChange={(e) => setValue(e.target.value)} aria-label="Dashboard token" />
-        <button type="submit" className="hd-btn">Connect</button>
-      </div>
-    </form>
-  )
-}
-
 function SettingsEditor({ settings, onSaved }: { settings: Settings; onSaved: (s: Settings) => void }) {
   const [form, setForm] = useState(settings)
   const [saving, setSaving] = useState(false)
@@ -119,7 +97,6 @@ function SettingsEditor({ settings, onSaved }: { settings: Settings; onSaved: (s
 }
 
 export function HealthDashboard() {
-  const [hasToken, setHasToken] = useState(() => !!getToken())
   const [range, setRange] = useState<SummaryRange>('week')
   const [summary, setSummary] = useState<Summary | null>(null)
   const [settings, setSettings] = useState<Settings | null>(null)
@@ -133,23 +110,17 @@ export function HealthDashboard() {
       const [s, cfg] = await Promise.all([fetchSummary(range), fetchSettings()])
       setSummary(s)
       setSettings(cfg)
-    } catch (err) {
-      if (err instanceof Error && (err.message === 'no-token' || err.message === 'unauthorized')) {
-        setHasToken(false)
-      } else {
-        setError("Can't reach Jarvis. This page only works on Trevor's private network.")
-      }
+    } catch {
+      setError("Can't reach Jarvis. This page only works on Trevor's private network.")
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    if (hasToken) load()
+    load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasToken, range])
-
-  if (!hasToken) return <div className="hd-card"><TokenPrompt onSaved={() => setHasToken(true)} /></div>
+  }, [range])
 
   return (
     <div className="hd-card">
@@ -231,7 +202,6 @@ export function HealthDashboard() {
       )}
 
       {settings && <SettingsEditor settings={settings} onSaved={setSettings} />}
-      <button className="hd-disconnect" onClick={() => { clearToken(); setHasToken(false) }}>Disconnect</button>
     </div>
   )
 }

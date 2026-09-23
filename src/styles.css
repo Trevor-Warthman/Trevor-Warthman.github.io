@@ -254,11 +254,7 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; }
 .hd-settings label { display: flex; flex-direction: column; gap: .3rem; color: #b7beba; font-size: .75rem; }
 .hd-settings input { padding: .5rem .6rem; color: #fff; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); border-radius: 8px; }
 .hd-btn { grid-column: 1 / -1; padding: .6rem; color: #0b0e0d; background: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-.hd-disconnect { margin-top: 1rem; padding: 0; color: #7f8783; background: none; border: none; font-size: .72rem; text-decoration: underline; cursor: pointer; }
 .hd-error { color: #f28b82; font-size: .85rem; }
-.hd-token-prompt p { margin: 0 0 1rem; color: #cfd6d3; font-size: .9rem; line-height: 1.6; }
-.hd-token-row { display: flex; gap: .5rem; }
-.hd-token-row input { flex: 1; padding: .6rem .7rem; color: #fff; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12); border-radius: 8px; }
 
 @media (max-width: 620px) {
   .hd-settings form { grid-template-columns: 1fr; }
