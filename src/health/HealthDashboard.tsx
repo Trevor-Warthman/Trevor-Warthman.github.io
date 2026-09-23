@@ -32,6 +32,19 @@ function fmtSigned(n: number) {
 function balanceClass(n: number) {
   return n > 0 ? 'hd-pos' : n < 0 ? 'hd-neg' : ''
 }
+// Active energy is throttled by iOS to roughly hourly background delivery even when the
+// pipeline is healthy, so "stale" starts at 3h, not immediately after the last hour ticks over.
+const STALE_AFTER_MINUTES = 180
+
+function syncAgeLabel(lastSyncAt: string | null): { text: string; className: string } {
+  if (!lastSyncAt) return { text: 'Never synced', className: 'hd-neg' }
+  const minutes = Math.round((Date.now() - new Date(lastSyncAt).getTime()) / 60000)
+  const text = minutes < 1 ? 'just now'
+    : minutes < 60 ? `${minutes}m ago`
+    : minutes < 24 * 60 ? `${Math.round(minutes / 60)}h ago`
+    : `${Math.round(minutes / (24 * 60))}d ago`
+  return { text: `Last synced ${text}`, className: minutes > STALE_AFTER_MINUTES ? 'hd-neg' : 'hd-pos' }
+}
 function rangeNounFor(range: SummaryRange) {
   return range === 'day' ? 'Daily' : range === 'week' ? 'Weekly' : range === 'month' ? 'Monthly' : range === 'year' ? 'Yearly' : 'All-Time'
 }
@@ -146,6 +159,11 @@ export function HealthDashboard() {
           {loading ? '⋯' : '✓'}
         </button>
       </div>
+
+      {summary && (() => {
+        const sync = syncAgeLabel(summary.lastSyncAt)
+        return <p className={`hd-sync-status ${sync.className}`}>{sync.text}</p>
+      })()}
 
       <div className="hd-range-tabs" role="tablist" aria-label="Time range">
         {RANGES.map((r) => (
