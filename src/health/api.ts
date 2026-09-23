@@ -1,8 +1,6 @@
 // Jarvis is Tailscale-only, so this page only works for viewers on Trevor's tailnet
-// (himself). The bearer token is entered once and kept in localStorage rather than
-// shipped in the built JS, since this repo and its bundle are public.
+// (himself) — that network boundary is the actual access control, not a token.
 const API_BASE = 'https://jarvis.tail690ef5.ts.net'
-const TOKEN_KEY = 'health-dashboard-token'
 
 export type SummaryRange = 'day' | 'week' | 'month' | 'year' | 'all'
 
@@ -70,30 +68,11 @@ export type Settings = {
 
 export type SettingsUpdate = Partial<Settings>
 
-export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY)
-}
-
-export function setToken(token: string) {
-  localStorage.setItem(TOKEN_KEY, token)
-}
-
-export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY)
-}
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = getToken()
-  if (!token) throw new Error('no-token')
-
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { ...init?.headers, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { ...init?.headers, 'Content-Type': 'application/json' },
   })
-  if (response.status === 401) {
-    clearToken()
-    throw new Error('unauthorized')
-  }
   if (!response.ok) throw new Error(`request-failed-${response.status}`)
   return response.json() as Promise<T>
 }
