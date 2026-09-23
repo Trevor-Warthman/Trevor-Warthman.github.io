@@ -274,8 +274,8 @@ function AboutPage() {
 }
 
 const fitnessLinks = [
-  { title: 'Calories & Weight', detail: 'Daily/weekly/monthly/yearly calorie, activity, and weight tracking against goals.', href: '/fitness/calories', external: false },
-  { title: 'Full FreeReps Dashboard', detail: 'All 70+ synced metrics, Grafana-style charts. Private — only loads on Trevor\'s Tailscale network.', href: 'https://jarvis.tail690ef5.ts.net:8443/', external: true },
+  { title: 'Calories & Weight', detail: 'Daily/weekly/monthly/yearly calorie, activity, and weight tracking against goals.', href: '/fitness/calories' },
+  { title: 'Full FreeReps Dashboard', detail: 'All 70+ synced metrics, Grafana-style charts. Private — only loads on Trevor\'s Tailscale network.', href: '/fitness/freereps' },
 ]
 
 function FitnessPage() {
@@ -283,19 +283,12 @@ function FitnessPage() {
     <>
       <PageHeader label="Personal" title="Fitness" intro="Health data synced from Apple Health, self-hosted on Jarvis." />
       <section className="content-section earlier-work-grid">
-        {fitnessLinks.map((link) =>
-          link.external ? (
-            <a href={link.href} target="_blank" rel="noreferrer" key={link.title}>
-              <div><h3>{link.title}</h3><p>{link.detail}</p></div>
-              <span>Open <Arrow /></span>
-            </a>
-          ) : (
-            <SiteLink href={link.href} key={link.title}>
-              <div><h3>{link.title}</h3><p>{link.detail}</p></div>
-              <span>Open →</span>
-            </SiteLink>
-          )
-        )}
+        {fitnessLinks.map((link) => (
+          <SiteLink href={link.href} key={link.title}>
+            <div><h3>{link.title}</h3><p>{link.detail}</p></div>
+            <span>Open →</span>
+          </SiteLink>
+        ))}
       </section>
     </>
   )
@@ -307,6 +300,27 @@ function FitnessCaloriesPage() {
       <PageHeader label="Fitness" title="Calories" intro="Calories, activity, and weight, synced from Apple Health." />
       <section className="content-section">
         <HealthDashboard />
+      </section>
+    </>
+  )
+}
+
+function FitnessFreeRepsPage() {
+  return (
+    <>
+      <PageHeader label="Fitness" title="FreeReps Dashboard" intro="All 70+ synced Apple Health metrics with Grafana-style charts, embedded live from Jarvis.">
+        <div className="button-row">
+          <a className="button" href="https://jarvis.tail690ef5.ts.net:8443/" target="_blank" rel="noreferrer">Open in a new tab <Arrow /></a>
+        </div>
+      </PageHeader>
+      <section className="content-section freereps-embed-section">
+        <p className="hd-sync-status">Private — only loads on Trevor's Tailscale network. A blank frame below means you're off-network, not that anything's broken.</p>
+        <iframe
+          className="freereps-embed"
+          src="https://jarvis.tail690ef5.ts.net:8443/"
+          title="FreeReps dashboard"
+          loading="lazy"
+        />
       </section>
     </>
   )
@@ -336,6 +350,7 @@ function routeTitle(pathname: string) {
   if (pathname === '/kitchen') return 'Kitchen — Trevor Warthman'
   if (pathname === '/fitness') return 'Fitness — Trevor Warthman'
   if (pathname === '/fitness/calories') return 'Calories — Trevor Warthman'
+  if (pathname === '/fitness/freereps') return 'FreeReps Dashboard — Trevor Warthman'
   return 'Page not found — Trevor Warthman'
 }
 
@@ -360,6 +375,7 @@ function App() {
   else if (pathname === '/kitchen') page = <KitchenPage />
   else if (pathname === '/fitness') page = <FitnessPage />
   else if (pathname === '/fitness/calories') page = <FitnessCaloriesPage />
+  else if (pathname === '/fitness/freereps') page = <FitnessFreeRepsPage />
   else page = <NotFoundPage />
   return <InternalLayout {...effectiveLocation}>{page}</InternalLayout>
 }
