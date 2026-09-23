@@ -286,18 +286,6 @@ function FitnessPage() {
           <br />Private — only loads on Trevor's Tailscale network.
         </p>
       </section>
-      <section className="content-section empty-state" id="fitness-roadmap">
-        <p className="section-label">What's next</p>
-        <h2>More rows, more pages</h2>
-        <p>
-          Planned: a sparkline per row so a week's trend is visible at a glance; a workouts row
-          (type, duration, heart-rate zones) once more than active-energy is tracked; a protein/macros
-          row alongside calories; and a "progress score" blending the calorie and weight trends into
-          one weekly grade. Related pages under this one: a workouts-only page, a weight-only page
-          with the full history chart, and a public read-only page fed by a periodic export instead
-          of a live Tailscale connection, so it works for anyone, not just Trevor.
-        </p>
-      </section>
     </>
   )
 }
