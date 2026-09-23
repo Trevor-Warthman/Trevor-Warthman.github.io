@@ -15,6 +15,12 @@ export type Bucket = {
   budgetUsedPct: number | null
   dailyBalanceKcal: number
   cumulativeBalanceKcal: number
+  // True when this bucket is entirely unlogged (0 of a nonzero total days logged) and
+  // not overridden as real. Day buckets are 0/1 or 1/1; month buckets (year/all-time
+  // views) aggregate, e.g. loggedDayCount 18 of totalDayCount 30.
+  isMissing: boolean
+  loggedDayCount: number
+  totalDayCount: number
 }
 
 export type Details = {
@@ -31,6 +37,13 @@ export type Details = {
   perRemainingDayKcal: number | null
   deficitKcal: number
   expectedDeficitKcal: number
+  // Averages over only the days actually logged (missing days excluded entirely,
+  // not zeroed and not counted as real low days).
+  loggedDayCount: number
+  totalCompleteDayCount: number
+  averageNetKcalPerLoggedDay: number | null
+  averageFoodKcalPerLoggedDay: number | null
+  averageActiveKcalPerLoggedDay: number | null
 }
 
 export type WeightSummary = {
@@ -89,4 +102,10 @@ export function fetchSettings(): Promise<Settings> {
 
 export function updateSettings(update: SettingsUpdate): Promise<Settings> {
   return request<Settings>('/health/settings', { method: 'PUT', body: JSON.stringify(update) })
+}
+
+// Mark a flagged day as real (e.g. "I was sick, this low/zero day is accurate"), or
+// pass markedReal: false to revert it back to the auto-detector's judgment.
+export function setDayOverride(day: string, markedReal: boolean): Promise<{ day: string; markedReal: boolean }> {
+  return request(`/health/day-overrides/${day}`, { method: 'PUT', body: JSON.stringify({ markedReal }) })
 }

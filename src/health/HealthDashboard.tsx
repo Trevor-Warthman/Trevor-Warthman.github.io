@@ -1,5 +1,5 @@
-import { FormEvent, useEffect, useState } from 'react'
-import { Bucket, Settings, SettingsUpdate, Summary, SummaryRange, fetchSettings, fetchSummary, updateSettings } from './api'
+import { FormEvent, MouseEvent, useEffect, useState } from 'react'
+import { Bucket, Settings, SettingsUpdate, Summary, SummaryRange, fetchSettings, fetchSummary, setDayOverride, updateSettings } from './api'
 
 const RANGES: { value: SummaryRange; label: string }[] = [
   { value: 'day', label: 'Day' },
@@ -45,6 +45,16 @@ function syncAgeLabel(lastSyncAt: string | null): { text: string; className: str
 function rangeNounFor(range: SummaryRange) {
   return range === 'day' ? 'Daily' : range === 'week' ? 'Weekly' : range === 'month' ? 'Monthly' : range === 'year' ? 'Yearly' : 'All-Time'
 }
+// True whenever a bucket has any unlogged day in it: day buckets are 0/1 or 1/1, so
+// this is exactly "missing" for those; month buckets (year/all-time) can be partial.
+function hasGap(b: Bucket) {
+  return b.totalDayCount > 0 && b.loggedDayCount < b.totalDayCount
+}
+// Day/week/month buckets are one real calendar day each, so they can be marked real
+// directly. Year/all-time buckets are whole months -- drill into Month view instead.
+function isDayGrain(range: SummaryRange) {
+  return range === 'day' || range === 'week' || range === 'month'
+}
 
 function RowCell({ rowKey, bucket }: { rowKey: (typeof ROW_KEYS)[number]; bucket: Bucket }) {
   switch (rowKey) {
@@ -57,13 +67,65 @@ function RowCell({ rowKey, bucket }: { rowKey: (typeof ROW_KEYS)[number]; bucket
   }
 }
 
-function MobileDayCard({ bucket }: { bucket: Bucket }) {
+function MarkRealButton({ day, onMarked }: { day: string; onMarked: () => void }) {
+  const [saving, setSaving] = useState(false)
+  const handleClick = async (event: MouseEvent) => {
+    event.stopPropagation()
+    setSaving(true)
+    try {
+      await setDayOverride(day, true)
+      onMarked()
+    } finally {
+      setSaving(false)
+    }
+  }
   return (
-    <div className="hd-mobile-day">
+    <button type="button" className="hd-mark-real" onClick={handleClick} disabled={saving}>
+      {saving ? '…' : 'Mark real'}
+    </button>
+  )
+}
+
+function MonthGapModal({ bucket, onClose }: { bucket: Bucket; onClose: () => void }) {
+  return (
+    <div className="hd-modal-backdrop" onClick={onClose}>
+      <div className="hd-modal" onClick={(event) => event.stopPropagation()}>
+        <div className="hd-modal-head">
+          <h4>{bucket.label}</h4>
+          <button type="button" className="hd-modal-close" onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <p>{bucket.loggedDayCount} of {bucket.totalDayCount} days logged this month.</p>
+        <p className="hd-modal-hint">Switch to Month view on that month to see and mark individual days as real.</p>
+      </div>
+    </div>
+  )
+}
+
+function MobileDayCard({ bucket, range, onMarked, onOpenModal }: {
+  bucket: Bucket
+  range: SummaryRange
+  onMarked: () => void
+  onOpenModal: (b: Bucket) => void
+}) {
+  const missing = hasGap(bucket)
+  const clickableMonth = missing && !isDayGrain(range)
+  return (
+    <div
+      className={`hd-mobile-day${missing ? ' hd-missing' : ''}`}
+      onClick={clickableMonth ? () => onOpenModal(bucket) : undefined}
+    >
       <div className="hd-mobile-day-head">
         <span className="hd-mobile-day-label">{bucket.label}</span>
         <span className={`hd-mobile-day-balance ${balanceClass(bucket.dailyBalanceKcal)}`}>{fmtSigned(bucket.dailyBalanceKcal)}</span>
       </div>
+      {missing && (
+        <div className="hd-missing-note">
+          {isDayGrain(range)
+            ? bucket.isMissing ? 'Missing data — under 1,400 kcal logged' : 'Missing data'
+            : `Missing data — ${bucket.loggedDayCount} of ${bucket.totalDayCount} days logged`}
+          {isDayGrain(range) && <MarkRealButton day={bucket.periodStart} onMarked={onMarked} />}
+        </div>
+      )}
       <div className="hd-mobile-day-grid">
         <div><span>Net</span><strong>{fmt(bucket.netKcal)}</strong></div>
         <div><span>Food</span><strong>{fmt(bucket.foodKcal)}</strong></div>
@@ -123,6 +185,7 @@ export function HealthDashboard() {
   const [settings, setSettings] = useState<Settings | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [modalBucket, setModalBucket] = useState<Bucket | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -167,30 +230,55 @@ export function HealthDashboard() {
 
       {error && <p className="hd-error">{error}</p>}
 
-      {summary && (
+      {summary && (() => {
+        const gapBuckets = summary.buckets.filter(hasGap)
+        return (
         <>
+          {gapBuckets.length > 0 && (
+            <p className="hd-missing-banner">
+              ⚠ Missing data: {gapBuckets.length} {isDayGrain(range) ? (gapBuckets.length === 1 ? 'day' : 'days') : (gapBuckets.length === 1 ? 'month' : 'months')} with under 1,400 kcal logged this {range === 'all' ? 'all-time view' : range}, excluded from averages.
+              {isDayGrain(range) ? ' Click "Mark real" on a highlighted day if it\'s accurate (e.g. sick day).' : ' Click a highlighted month for details.'}
+            </p>
+          )}
           <div className="hd-table-wrap hd-desktop-only">
             <table className="hd-table">
               <thead>
                 <tr>
                   <th className="hd-row-label"> </th>
-                  {summary.buckets.map((b) => <th key={b.periodStart}>{b.label}</th>)}
+                  {summary.buckets.map((b) => {
+                    const missing = hasGap(b)
+                    const clickableMonth = missing && !isDayGrain(range)
+                    return (
+                      <th
+                        key={b.periodStart}
+                        className={missing ? 'hd-missing' : ''}
+                        onClick={clickableMonth ? () => setModalBucket(b) : undefined}
+                      >
+                        {b.label}
+                        {missing && isDayGrain(range) && <MarkRealButton day={b.periodStart} onMarked={load} />}
+                      </th>
+                    )
+                  })}
                 </tr>
               </thead>
               <tbody>
                 {ROW_KEYS.map((key) => (
                   <tr key={key} className={key === 'dailyBalance' || key === 'balance' ? 'hd-row-strong' : ''}>
                     <th className="hd-row-label">{ROW_LABELS[key]}</th>
-                    {summary.buckets.map((b) => <td key={b.periodStart}><RowCell rowKey={key} bucket={b} /></td>)}
+                    {summary.buckets.map((b) => <td key={b.periodStart} className={hasGap(b) ? 'hd-missing' : ''}><RowCell rowKey={key} bucket={b} /></td>)}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <div className="hd-mobile-days">
-            {summary.buckets.map((b) => <MobileDayCard key={b.periodStart} bucket={b} />)}
+            {summary.buckets.map((b) => (
+              <MobileDayCard key={b.periodStart} bucket={b} range={range} onMarked={load} onOpenModal={setModalBucket} />
+            ))}
           </div>
           <p className="hd-note">Balance counts completed {range === 'day' ? 'periods' : 'days'}. The current period is in progress. All calories are kcal.</p>
+
+          {modalBucket && <MonthGapModal bucket={modalBucket} onClose={() => setModalBucket(null)} />}
 
           <h3 className="hd-details-heading">Details</h3>
           <dl className="hd-details">
@@ -211,6 +299,17 @@ export function HealthDashboard() {
             Budget used = Net &divide; net budget &times; 100
           </p>
 
+          <h3 className="hd-details-heading">Averages (days actually logged)</h3>
+          <dl className="hd-details">
+            <div><dt>Days logged</dt><dd>{summary.details.loggedDayCount} of {summary.details.totalCompleteDayCount}</dd></div>
+            <div><dt>Avg net / day</dt><dd>{summary.details.averageNetKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageNetKcalPerLoggedDay)} kcal`}</dd></div>
+            <div><dt>Avg food / day</dt><dd>{summary.details.averageFoodKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageFoodKcalPerLoggedDay)} kcal`}</dd></div>
+            <div><dt>Avg active / day</dt><dd>{summary.details.averageActiveKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageActiveKcalPerLoggedDay)} kcal`}</dd></div>
+          </dl>
+          <p className="hd-formulas">
+            Missing days (under 1,400 kcal logged, unless marked real) are excluded from these averages entirely — not counted as zero, not counted as a real low day.
+          </p>
+
           <h3 className="hd-details-heading">Weight</h3>
           <dl className="hd-details">
             <div><dt>Latest</dt><dd>{summary.weight.latestLb === null ? 'No data' : `${summary.weight.latestLb} lb (${summary.weight.latestDate})`}</dd></div>
@@ -223,7 +322,8 @@ export function HealthDashboard() {
             <div><dt>Required pace</dt><dd>{summary.weight.requiredWeeklyRateLb === null ? '—' : `${summary.weight.requiredWeeklyRateLb} lb/wk, ${summary.weight.daysToGoal} days left`}</dd></div>
           </dl>
         </>
-      )}
+        )
+      })()}
 
       {settings && <SettingsEditor settings={settings} onSaved={setSettings} />}
     </div>
