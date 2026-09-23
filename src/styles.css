@@ -256,8 +256,29 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; }
 .hd-btn { grid-column: 1 / -1; padding: .6rem; color: #0b0e0d; background: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 .hd-error { color: #f28b82; font-size: .85rem; }
 
+/* Mobile day cards replace the horizontal-scroll table below 620px — a wide
+   table with six rows per day column doesn't work on a narrow screen, but a
+   vertically-stacked list of day cards does. .hd-mobile-only is hidden by
+   default (desktop shows the table); the media query below flips both. */
+.hd-mobile-days { display: none; flex-direction: column; gap: .6rem; }
+.hd-mobile-day { padding: .85rem 1rem; border-radius: 14px; background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02)); }
+.hd-mobile-day-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .6rem; }
+.hd-mobile-day-label { font-weight: 700; font-size: .95rem; color: #fff; }
+.hd-mobile-day-balance { font-weight: 700; font-size: .95rem; }
+.hd-mobile-day-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; text-align: center; }
+.hd-mobile-day-grid > div { display: flex; flex-direction: column; gap: .2rem; }
+.hd-mobile-day-grid span { color: #8a938e; font-size: .62rem; text-transform: uppercase; letter-spacing: .04em; }
+.hd-mobile-day-grid strong { color: #fff; font-size: .88rem; font-weight: 600; }
+.hd-mobile-day-balance-row { display: flex; align-items: center; justify-content: space-between; margin-top: .65rem; padding-top: .55rem; border-top: 1px solid rgba(255, 255, 255, .08); }
+.hd-mobile-day-balance-row span { color: #b7beba; font-size: .78rem; }
+.hd-mobile-day-balance-row strong { font-size: .9rem; }
+
 @media (max-width: 620px) {
   .hd-settings form { grid-template-columns: 1fr; }
+  .hd-desktop-only { display: none; }
+  .hd-mobile-days { display: flex; }
+  .hd-card { padding: 1.1rem; border-radius: 18px; }
+  .hd-details > div { flex-wrap: wrap; }
 }
 .hd-sync-status { margin: 0 0 1rem; font-family: var(--utility); font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .freereps-embed-section { padding-top: 1.5rem; }

@@ -57,6 +57,27 @@ function RowCell({ rowKey, bucket }: { rowKey: (typeof ROW_KEYS)[number]; bucket
   }
 }
 
+function MobileDayCard({ bucket }: { bucket: Bucket }) {
+  return (
+    <div className="hd-mobile-day">
+      <div className="hd-mobile-day-head">
+        <span className="hd-mobile-day-label">{bucket.label}</span>
+        <span className={`hd-mobile-day-balance ${balanceClass(bucket.dailyBalanceKcal)}`}>{fmtSigned(bucket.dailyBalanceKcal)}</span>
+      </div>
+      <div className="hd-mobile-day-grid">
+        <div><span>Net</span><strong>{fmt(bucket.netKcal)}</strong></div>
+        <div><span>Food</span><strong>{fmt(bucket.foodKcal)}</strong></div>
+        <div><span>Active</span><strong>{fmt(bucket.activeKcal)}</strong></div>
+        <div><span>Budget</span><strong>{bucket.budgetUsedPct === null ? '—' : `${fmt(bucket.budgetUsedPct)}%`}</strong></div>
+      </div>
+      <div className="hd-mobile-day-balance-row">
+        <span>Running balance</span>
+        <strong className={balanceClass(bucket.cumulativeBalanceKcal)}>{fmtSigned(bucket.cumulativeBalanceKcal)}</strong>
+      </div>
+    </div>
+  )
+}
+
 function SettingsEditor({ settings, onSaved }: { settings: Settings; onSaved: (s: Settings) => void }) {
   const [form, setForm] = useState(settings)
   const [saving, setSaving] = useState(false)
@@ -148,7 +169,7 @@ export function HealthDashboard() {
 
       {summary && (
         <>
-          <div className="hd-table-wrap">
+          <div className="hd-table-wrap hd-desktop-only">
             <table className="hd-table">
               <thead>
                 <tr>
@@ -165,6 +186,9 @@ export function HealthDashboard() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="hd-mobile-days">
+            {summary.buckets.map((b) => <MobileDayCard key={b.periodStart} bucket={b} />)}
           </div>
           <p className="hd-note">Balance counts completed {range === 'day' ? 'periods' : 'days'}. The current period is in progress. All calories are kcal.</p>
 
