@@ -56,6 +56,7 @@ export type Summary = {
   buckets: Bucket[]
   details: Details
   weight: WeightSummary
+  lastSyncAt: string | null
 }
 
 export type Settings = {
