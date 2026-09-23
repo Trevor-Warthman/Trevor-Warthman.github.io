@@ -273,18 +273,40 @@ function AboutPage() {
   )
 }
 
+const fitnessLinks = [
+  { title: 'Calories & Weight', detail: 'Daily/weekly/monthly/yearly calorie, activity, and weight tracking against goals.', href: '/fitness/calories', external: false },
+  { title: 'Full FreeReps Dashboard', detail: 'All 70+ synced metrics, Grafana-style charts. Private — only loads on Trevor\'s Tailscale network.', href: 'https://jarvis.tail690ef5.ts.net:8443/', external: true },
+]
+
 function FitnessPage() {
   return (
     <>
-      <PageHeader label="Personal" title="Fitness" intro="Calories, activity, and weight, synced from Apple Health." />
+      <PageHeader label="Personal" title="Fitness" intro="Health data synced from Apple Health, self-hosted on Jarvis." />
+      <section className="content-section earlier-work-grid">
+        {fitnessLinks.map((link) =>
+          link.external ? (
+            <a href={link.href} target="_blank" rel="noreferrer" key={link.title}>
+              <div><h3>{link.title}</h3><p>{link.detail}</p></div>
+              <span>Open <Arrow /></span>
+            </a>
+          ) : (
+            <SiteLink href={link.href} key={link.title}>
+              <div><h3>{link.title}</h3><p>{link.detail}</p></div>
+              <span>Open →</span>
+            </SiteLink>
+          )
+        )}
+      </section>
+    </>
+  )
+}
+
+function FitnessCaloriesPage() {
+  return (
+    <>
+      <PageHeader label="Fitness" title="Calories" intro="Calories, activity, and weight, synced from Apple Health." />
       <section className="content-section">
         <HealthDashboard />
-        <p className="hd-external-link">
-          <a href="https://jarvis.tail690ef5.ts.net:8443/" target="_blank" rel="noreferrer">
-            Full FreeReps dashboard (all 70+ metrics, Grafana-style charts) <Arrow />
-          </a>
-          <br />Private — only loads on Trevor's Tailscale network.
-        </p>
       </section>
     </>
   )
@@ -313,6 +335,7 @@ function routeTitle(pathname: string) {
   if (pathname === '/about') return 'About — Trevor Warthman'
   if (pathname === '/kitchen') return 'Kitchen — Trevor Warthman'
   if (pathname === '/fitness') return 'Fitness — Trevor Warthman'
+  if (pathname === '/fitness/calories') return 'Calories — Trevor Warthman'
   return 'Page not found — Trevor Warthman'
 }
 
@@ -336,6 +359,7 @@ function App() {
   else if (pathname === '/about') page = <AboutPage />
   else if (pathname === '/kitchen') page = <KitchenPage />
   else if (pathname === '/fitness') page = <FitnessPage />
+  else if (pathname === '/fitness/calories') page = <FitnessCaloriesPage />
   else page = <NotFoundPage />
   return <InternalLayout {...effectiveLocation}>{page}</InternalLayout>
 }
