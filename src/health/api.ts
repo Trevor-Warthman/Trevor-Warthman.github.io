@@ -21,8 +21,8 @@ export type Bucket = {
   isMissing: boolean
   loggedDayCount: number
   totalDayCount: number
-  // Average of daily weight samples within the bucket, null if none logged. Only
-  // populated for month-grain buckets (year/all-time views).
+  // Weight for the bucket: a single day-grain buckets' own sample, or the average
+  // across the month for month-grain (year/all-time) buckets. Null if none logged.
   weightLb: number | null
 }
 
@@ -47,6 +47,9 @@ export type Details = {
   averageNetKcalPerLoggedDay: number | null
   averageFoodKcalPerLoggedDay: number | null
   averageActiveKcalPerLoggedDay: number | null
+  // Count of complete days (same denominator as totalCompleteDayCount) with at least
+  // 20 minutes of Apple exercise time logged that day.
+  workoutDayCount: number
 }
 
 export type WeightSummary = {

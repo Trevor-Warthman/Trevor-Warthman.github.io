@@ -160,6 +160,53 @@ function MobileDayCard({ bucket, range, onMarked, onOpenModal }: {
   )
 }
 
+// Dependency-free SVG line chart -- no charting library, so no bundle-size or
+// version-drift risk for one chart. Point x-position uses the bucket's index in the
+// full period (not just among points with data), so a weight logged mid-period sits
+// spatially where it happened instead of the gaps being silently compressed away.
+function WeightChart({ buckets, goalWeightLb }: { buckets: Bucket[]; goalWeightLb: number }) {
+  const points = buckets
+    .map((b, i) => ({ i, label: b.label, weight: b.weightLb }))
+    .filter((p): p is { i: number; label: string; weight: number } => p.weight !== null)
+
+  if (points.length < 2) {
+    return <p className="hd-chart-empty">Not enough weight samples in this period to chart yet.</p>
+  }
+
+  const width = 600
+  const height = 180
+  const padding = { top: 16, right: 12, bottom: 22, left: 12 }
+  const values = points.map((p) => p.weight)
+  const minRaw = Math.min(...values, goalWeightLb)
+  const maxRaw = Math.max(...values, goalWeightLb)
+  const pad = Math.max((maxRaw - minRaw) * 0.15, 1)
+  const min = minRaw - pad
+  const max = maxRaw + pad
+
+  const denom = buckets.length - 1 || 1
+  const xFor = (i: number) => padding.left + (i / denom) * (width - padding.left - padding.right)
+  const yFor = (w: number) => padding.top + (1 - (w - min) / (max - min)) * (height - padding.top - padding.bottom)
+
+  const linePath = points.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${xFor(p.i).toFixed(1)} ${yFor(p.weight).toFixed(1)}`).join(' ')
+  const goalY = yFor(goalWeightLb)
+  const goalInRange = goalWeightLb >= minRaw - pad && goalWeightLb <= maxRaw + pad
+
+  return (
+    <svg className="hd-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Weight over time, with goal weight">
+      {goalInRange && (
+        <>
+          <line x1={padding.left} y1={goalY} x2={width - padding.right} y2={goalY} className="hd-chart-goal-line" />
+          <text x={width - padding.right} y={goalY - 4} className="hd-chart-goal-label" textAnchor="end">Goal {goalWeightLb} lb</text>
+        </>
+      )}
+      <path d={linePath} className="hd-chart-line" fill="none" />
+      {points.map((p) => <circle key={p.i} cx={xFor(p.i)} cy={yFor(p.weight)} r={3} className="hd-chart-dot" />)}
+      <text x={xFor(points[0].i)} y={height - 4} className="hd-chart-axis-label" textAnchor="start">{points[0].label}</text>
+      <text x={xFor(points[points.length - 1].i)} y={height - 4} className="hd-chart-axis-label" textAnchor="end">{points[points.length - 1].label}</text>
+    </svg>
+  )
+}
+
 function SettingsEditor({ settings, onSaved }: { settings: Settings; onSaved: (s: Settings) => void }) {
   const [form, setForm] = useState(settings)
   const [saving, setSaving] = useState(false)
@@ -263,6 +310,7 @@ export function HealthDashboard() {
                 <div><dt>Avg net / day</dt><dd>{summary.details.averageNetKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageNetKcalPerLoggedDay)} kcal`}</dd></div>
                 <div><dt>Avg food / day</dt><dd>{summary.details.averageFoodKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageFoodKcalPerLoggedDay)} kcal`}</dd></div>
                 <div><dt>Avg active / day</dt><dd>{summary.details.averageActiveKcalPerLoggedDay === null ? '—' : `${fmt(summary.details.averageActiveKcalPerLoggedDay)} kcal`}</dd></div>
+                <div><dt>Workout days</dt><dd>{summary.details.workoutDayCount} of {summary.details.totalCompleteDayCount}</dd></div>
               </dl>
               <p className="hd-formulas hd-formulas-top">
                 Averaged over only the days actually logged {periodPhrase(range)} — missing days are excluded entirely, not counted as zero or as a real low day, so this stays accurate even with sparse logging.
@@ -358,6 +406,8 @@ export function HealthDashboard() {
             <div><dt>Goal</dt><dd>{summary.weight.goalWeightLb} lb by {summary.weight.goalDate}</dd></div>
             <div><dt>Required pace</dt><dd>{summary.weight.requiredWeeklyRateLb === null ? '—' : `${summary.weight.requiredWeeklyRateLb} lb/wk, ${summary.weight.daysToGoal} days left`}</dd></div>
           </dl>
+          <h3 className="hd-details-heading">Weight, {periodPhrase(range)}</h3>
+          <WeightChart buckets={summary.buckets} goalWeightLb={summary.weight.goalWeightLb} />
         </>
         )
       })()}
