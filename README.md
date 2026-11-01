@@ -12,7 +12,7 @@ The homepage is an interactive site graph. Every route renders the same connecte
 - `/projects/:slug` — reusable project detail pages
 - `/personal` — personal directory
 - `/about` — personal introduction
-- `/kitchen` — recipe section
+- `/recipes` — Recipes page linking to the Pensieve "Recipes" lexicon (`/kitchen` redirects here)
 
 ## Local development
 
