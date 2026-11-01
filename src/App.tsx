@@ -326,11 +326,18 @@ function FitnessFreeRepsPage() {
   )
 }
 
-function KitchenPage() {
+function RecipesPage() {
   return (
     <>
-      <PageHeader label="Personal" title="Kitchen" intro="Recipes and cooking notes." />
-      <section className="content-section empty-state"><p className="section-label">No entries yet</p><h2>Recipes will be added here.</h2><p>Entries can include ingredients, steps, photos, revisions, and notes.</p></section>
+      <PageHeader label="Personal" title="Recipes" intro="Recipes I cook, collected from around the web and my own kitchen, published as a Pensieve lexicon.">
+        <div className="button-row">
+          <a className="button button--solid" href="https://pensieve.click/recipes" target="_blank" rel="noreferrer">Open the Recipes lexicon <Arrow /></a>
+        </div>
+      </PageHeader>
+      <section className="content-section">
+        <p className="section-label">About</p>
+        <p>Every recipe is a Markdown note with ingredients, steps, and source link. Chef imports them from links, videos, and screenshots; Pensieve publishes them. Favorites are bookmarked inside the lexicon.</p>
+      </section>
     </>
   )
 }
@@ -347,7 +354,7 @@ function routeTitle(pathname: string) {
   if (pathname === '/projects') return 'Projects — Trevor Warthman'
   if (pathname.startsWith('/projects/')) return 'Project — Trevor Warthman'
   if (pathname === '/about') return 'About — Trevor Warthman'
-  if (pathname === '/kitchen') return 'Kitchen — Trevor Warthman'
+  if (pathname === '/recipes') return 'Recipes — Trevor Warthman'
   if (pathname === '/fitness') return 'Fitness — Trevor Warthman'
   if (pathname === '/fitness/calories') return 'Calories — Trevor Warthman'
   if (pathname === '/fitness/freereps') return 'FreeReps Dashboard — Trevor Warthman'
@@ -356,7 +363,7 @@ function routeTitle(pathname: string) {
 
 function App() {
   const location = useLocation()
-  const legacyTarget = location.pathname === '/portfolio' ? '/experience' : location.pathname === '/personal' ? '/about' : undefined
+  const legacyTarget = location.pathname === '/portfolio' ? '/experience' : location.pathname === '/personal' ? '/about' : location.pathname === '/kitchen' ? '/recipes' : undefined
   const pathname = legacyTarget ?? location.pathname
   const effectiveLocation = { ...location, pathname }
   useEffect(() => {
@@ -372,7 +379,7 @@ function App() {
   else if (pathname === '/projects') page = <ProjectsPage />
   else if (pathname.startsWith('/projects/')) page = <ProjectPage slug={pathname.split('/').pop()!} />
   else if (pathname === '/about') page = <AboutPage />
-  else if (pathname === '/kitchen') page = <KitchenPage />
+  else if (pathname === '/recipes') page = <RecipesPage />
   else if (pathname === '/fitness') page = <FitnessPage />
   else if (pathname === '/fitness/calories') page = <FitnessCaloriesPage />
   else if (pathname === '/fitness/freereps') page = <FitnessFreeRepsPage />

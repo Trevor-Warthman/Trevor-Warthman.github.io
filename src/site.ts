@@ -37,7 +37,7 @@ export const siteNodes: SiteNode[] = [
 
   { id: 'personal', label: 'Personal', group: 'personal', kind: 'category' },
   { id: 'about', label: 'About', href: '/about', group: 'personal', kind: 'page', featured: true },
-  { id: 'kitchen', label: 'Kitchen', href: '/kitchen', group: 'personal', kind: 'page', featured: true },
+  { id: 'recipes', label: 'Recipes', href: '/recipes', group: 'personal', kind: 'page', featured: true },
   { id: 'fitness', label: 'Fitness', href: '/fitness', group: 'personal', kind: 'page', featured: true },
   { id: 'fitness-calories', label: 'Calories', href: '/fitness/calories', group: 'personal', kind: 'page', featured: true },
   { id: 'fitness-freereps', label: 'FreeReps Dashboard', shortLabel: 'FreeReps', href: '/fitness/freereps', group: 'personal', kind: 'page', featured: true },
@@ -61,14 +61,14 @@ export const siteEdges: SiteEdge[] = [
   { id: 'projects-chrome', source: 'projects', target: 'chrome', kind: 'hierarchy' },
   { id: 'projects-earlier', source: 'projects', target: 'earlier-work', kind: 'hierarchy' },
   { id: 'personal-about', source: 'personal', target: 'about', kind: 'hierarchy' },
-  { id: 'personal-kitchen', source: 'personal', target: 'kitchen', kind: 'hierarchy' },
+  { id: 'personal-recipes', source: 'personal', target: 'recipes', kind: 'hierarchy' },
   { id: 'personal-fitness', source: 'personal', target: 'fitness', kind: 'hierarchy' },
   { id: 'fitness-calories-edge', source: 'fitness', target: 'fitness-calories', kind: 'hierarchy' },
   { id: 'fitness-freereps-edge', source: 'fitness', target: 'fitness-freereps', kind: 'hierarchy' },
   { id: 'personal-castle', source: 'personal', target: 'castle', kind: 'hierarchy' },
   { id: 'personal-dylan', source: 'personal', target: 'dylan', kind: 'hierarchy' },
   { id: 'pensieve-castle', source: 'pensieve', target: 'castle', kind: 'mention' },
-  { id: 'chef-kitchen', source: 'chef', target: 'kitchen', kind: 'mention' },
+  { id: 'chef-recipes', source: 'chef', target: 'recipes', kind: 'mention' },
   { id: 'about-dylan', source: 'about', target: 'dylan', kind: 'mention' },
 ]
 
